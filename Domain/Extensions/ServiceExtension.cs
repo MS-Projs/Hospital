@@ -10,7 +10,8 @@ public static class ServiceExtension
 {
     public static IServiceCollection AddDomain(this IServiceCollection services, IConfiguration configuration)
     {
-        
+        //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+ 
         return services;
     }
     

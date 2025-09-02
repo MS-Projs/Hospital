@@ -18,6 +18,7 @@ public static class ServiceExtension
     public static void RegisterServices(this IServiceCollection services, IConfiguration configuration)
     {
         //services.Configure<DatabaseOptions>(configuration.GetSection("DatabaseOptions"));
+        //services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddDomain(configuration)
             .AddInfrastructure(configuration)
             .AddApplication(configuration)
@@ -26,6 +27,7 @@ public static class ServiceExtension
 
     public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
+        services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
             var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()!;

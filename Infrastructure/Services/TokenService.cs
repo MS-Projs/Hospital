@@ -31,7 +31,7 @@ internal class TokenService(
                 new(JwtRegisteredClaimNames.FamilyName, tokenParams.LastName),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.MobilePhone, tokenParams.Phone),
-                new(ClaimTypes.Role, tokenParams.Role)
+                new(ClaimTypes.Role, tokenParams.Role??"user")
             };
 
             var token = new JwtSecurityToken(jwtOptions.Value.Issuer, jwtOptions.Value.Audience, claims,
@@ -43,7 +43,7 @@ internal class TokenService(
 
             return Task.FromResult<Result<GeneratedTokenResult>>(new GeneratedTokenResult(tokenString, expiry));
         }
-        catch (Exception ex)
+                                      catch (Exception ex)
         {
             logger.LogCritical(ex, "Error generating token for user {UserId}", tokenParams.Id);
             return Task.FromResult<Result<GeneratedTokenResult>>(new ErrorModel(ErrorEnum.InternalServerError));
