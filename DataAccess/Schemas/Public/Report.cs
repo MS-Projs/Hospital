@@ -28,7 +28,7 @@ public class Report : Entity
 
     [Required]
     [MaxLength(400)]
-    [Column("pdf_path")]
+    [Column("pdf_path")]       
     public string PdfPath { get; set; } = default!;
 
     [Column("report_date")]

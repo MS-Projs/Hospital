@@ -33,9 +33,7 @@ public class Appointment : Entity
 
     [Column("status")]
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
-
-    [Column("created_at")]
-    public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    
 }
 
 

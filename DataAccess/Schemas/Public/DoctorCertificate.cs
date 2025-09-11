@@ -8,11 +8,11 @@ namespace DataAccess.Schemas.Public;
 [Table("doctor_certificates", Schema = "public")]
 public class DoctorCertificate : Entity
 {
-    [Column("patient_id")]
-    public long PatientId { get; set; }
+    [Column("doctor_id")]
+    public long DoctorId { get; set; }
 
-    [ForeignKey(nameof(PatientId))]
-    public Patient Patient { get; set; } = default!;
+    [ForeignKey(nameof(DoctorId))]
+    public Doctor Doctor { get; set; } = default!;
 
     [Required]
     [MaxLength(400)]

@@ -1,30 +1,27 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using DataAccess.Models;
 using DataAccess.Schemas.Auth;
-using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json;
 
-namespace DataAccess.Schemas.Public;
+namespace Domain.Models.API.Requests;
 
-[Table("doctors", Schema = "public")]
-[Index(nameof(UserId), IsUnique = true)]
-public class Doctor : Entity
+public class UpsertDoctorRequest
 {
+    [JsonProperty("id")] 
+    public long Id { get; set; } = 0;
+    
     [Column("user_id")]
     public long UserId { get; set; }
-
-    [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = default!;
-
+    
     [Required]
     [MaxLength(200)]
     [Column("full_name")]
-    public string FullName { get; set; } = default!;
-
+    public string FullName { get; set; } 
+    
     [Required]
     [MaxLength(100)]
     [Column("specialization")]
-    public string Specialization { get; set; } = default!;
+    public string Specialization { get; set; }
 
     [Range(0, 80)]
     [Column("experience_years")]
