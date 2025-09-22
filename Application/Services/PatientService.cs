@@ -125,7 +125,7 @@ public class PatientService : IPatient
             if ( request?.Age != 0) 
                 patients = patients.Where(x => x.Age >= request!.Age);
 
-            
+                      
             var result = await patients.OrderBy(x => x.FullName)
                 .Select(x => new PatientViewModel(x))
                 .ToListAsync(cancellationToken: cancellationToken);
@@ -148,18 +148,19 @@ public class PatientService : IPatient
                 .FirstOrDefaultAsync(c => c.Id == patientId, cancellationToken: cancellationToken);
 
             if (patient is null)
-                return new ErrorModel(ErrorEnum.DoctorNotFound);
+                return new ErrorModel(ErrorEnum.PatientNotFound);
 
             patient.Status = EntityStatus.Deleted;
             patient.UpdatedDate = DateTime.Now;
 
             await _context.SaveChangesAsync(cancellationToken);
+            
 
             return new PatientViewModel(patient);
         }
         catch (Exception ex)
         {
             return new ErrorModel(ErrorEnum.InternalServerError);
-        }
+        }                
     }
 }

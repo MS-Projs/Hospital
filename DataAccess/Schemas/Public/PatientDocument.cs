@@ -27,7 +27,9 @@ public class PatientDocument : Entity
 
     [MaxLength(64)]
     [Column("category")]
-    public string? Category { get; set; }
+    public long? Category { get; set; }
+    [ForeignKey(nameof(DocumentCategory))]
+    public DocumentCategory DocumentCategory { get; set; } = default!;
 
     [Required]
     [MaxLength(512)]
