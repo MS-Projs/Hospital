@@ -22,7 +22,7 @@ public class DoctorCertificate : Entity
     [Required]
     [MaxLength(32)]
     [Column("file_type")]
-    public string FileType { get; set; } = default!; // MR, Tahlil, Recept
+    public string FileType { get; set; } = default!;
 
     [MaxLength(64)]
     [Column("category")]

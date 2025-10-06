@@ -14,5 +14,6 @@ public partial class EntityContext
     public virtual DbSet<Report> Reports { get; set; }
     public virtual DbSet<Appointment> Appointments { get; set; }
     public virtual DbSet<PatientDocument> PatientDocuments { get; set; }
+    public virtual DbSet<CertificateType> CertificateTypes { get; set; }
 
 }
