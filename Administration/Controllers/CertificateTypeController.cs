@@ -46,7 +46,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     public async Task<Result<CertificateTypeViewModel>> GetCertificateType(
         [FromQuery] long certificateTypeId)
     {
-        return await _certificateTypeService.GetCertificateType(certificateTypeId, UserId);
+        return await _certificateTypeService.GetType(certificateTypeId, UserId);
     }
 
     /// <summary>
@@ -58,7 +58,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     public async Task<Result<PagedResult<CertificateTypeViewModel>>> GetCertificateTypes(
         PagedRequest request)
     {
-        return await _certificateTypeService.GetCertificateTypes(request, UserId);
+        return await _certificateTypeService.GetTypes(request, UserId);
     }
 
     #endregion

@@ -10,5 +10,6 @@ public enum ErrorEnum : short
     DoctorAlreadyExist,
     PatientAlreadyExist,
     PatientNotFound,
-    CertificateTypeNotFound
+    CertificateTypeNotFound,
+    DocumentCategoryNotFound
 }

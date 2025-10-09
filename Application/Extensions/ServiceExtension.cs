@@ -14,6 +14,11 @@ public static class ServiceExtension
         services
             .AddScoped<IUserService,
                 UserService>();
+        services.AddScoped<IDoctor, DoctorService>()
+            .AddScoped<IPatient, PatientService>()
+            .AddScoped<IDocumentCategory, DocumentCategoryService>()
+            .AddScoped<ICertificateType, CertificateTypeService>();
+        
         return services;
     }
 
