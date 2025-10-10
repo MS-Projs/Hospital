@@ -15,6 +15,7 @@ public static class ServiceExtension
         services.AddHttpContextAccessor();
         
         services.AddSingleton<ITokenService, TokenService>();
+        services.AddScoped<IFileService, FileService>();
         return services;
     }
 }

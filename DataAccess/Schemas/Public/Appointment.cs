@@ -31,6 +31,13 @@ public class Appointment : Entity
     [Column("preferred_date")]
     public DateTime? PreferredDate { get; set; }
 
+    [Column("scheduled_date")]
+    public DateTime? ScheduledDate { get; set; }
+
+    [MaxLength(500)]
+    [Column("notes")]
+    public string? Notes { get; set; }
+
     [Column("status")]
     public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
     

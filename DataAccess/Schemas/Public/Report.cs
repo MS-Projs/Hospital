@@ -26,10 +26,19 @@ public class Report : Entity
     [Column("report_text", TypeName = "text")]
     public string ReportText { get; set; } = default!;
 
-    [Required]
     [MaxLength(400)]
     [Column("pdf_path")]       
-    public string PdfPath { get; set; } = default!;
+    public string? PdfPath { get; set; }
+
+    [Column("appointment_id")]
+    public long? AppointmentId { get; set; }
+
+    [ForeignKey(nameof(AppointmentId))]
+    public Appointment? Appointment { get; set; }
+
+    [MaxLength(500)]
+    [Column("notes")]
+    public string? Notes { get; set; }
 
     [Column("report_date")]
     public DateTime ReportDate { get; set; } = DateTime.UtcNow;

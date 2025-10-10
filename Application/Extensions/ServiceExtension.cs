@@ -12,8 +12,12 @@ public static class ServiceExtension
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddScoped<IUserService,
-                UserService>();
+            .AddScoped<IUserService, UserService>()
+            .AddScoped<IPatient, PatientService>()
+            .AddScoped<IDoctor, DoctorService>()
+            .AddScoped<ICertificateType, CertificateTypeService>()
+            .AddScoped<IAppointment, AppointmentService>()
+            .AddScoped<IReport, ReportService>();
         return services;
     }
 
