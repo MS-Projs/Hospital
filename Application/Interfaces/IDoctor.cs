@@ -14,4 +14,10 @@ public interface IDoctor
 
     Task<Result<DoctorViewModel>> DoctorToggleActivation(long doctorId,
         CancellationToken cancellationToken);
+    
+    // Certificate Management
+    Task<Result<CertificateViewModel>> UploadDoctorCertificate(UploadDoctorCertificateRequest request, CancellationToken cancellationToken);
+    Task<Result<List<CertificateViewModel>>> GetDoctorCertificates(long doctorId, CancellationToken cancellationToken);
+    Task<Result<(Stream stream, string fileName, string contentType)>> DownloadDoctorCertificate(long certificateId, CancellationToken cancellationToken);
+    Task<Result<bool>> DeleteDoctorCertificate(long certificateId, CancellationToken cancellationToken);
 }

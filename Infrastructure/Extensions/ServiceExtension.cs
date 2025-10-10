@@ -12,10 +12,10 @@ public static class ServiceExtension
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        HttpContextExtension.Configure(services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
+        services.AddHttpContextAccessor();
         
         services.AddSingleton<ITokenService, TokenService>();
+        services.AddScoped<IFileService, FileService>();
         return services;
     }
 }

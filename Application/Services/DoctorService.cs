@@ -7,7 +7,10 @@ using Domain.Extensions;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
+using Infrastructure.Extensions;
+using Infrastructure.Interfaces;
 using Mapster;
+using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 
 namespace Application.Services;
@@ -15,10 +18,14 @@ namespace Application.Services;
 public class DoctorService : IDoctor
 {
     private readonly EntityContext _context;
+    private readonly IFileService _fileService;
+    private readonly IHttpContextAccessor _httpContextAccessor;
 
-    public DoctorService(EntityContext context)
+    public DoctorService(EntityContext context, IFileService fileService, IHttpContextAccessor httpContextAccessor)
     {
         _context = context;
+        _fileService = fileService;
+        _httpContextAccessor = httpContextAccessor;
     }
 
     public async Task<Result<DoctorViewModel>> UpsertDoctor(UpsertDoctorRequest doctorRequest, CancellationToken cancellationToken)
@@ -68,7 +75,7 @@ public class DoctorService : IDoctor
         doctor.ExperienceYears = doctorRequest.ExperienceYears;
         doctor.Workplace = doctorRequest.Workplace;
         doctor.Biography = doctorRequest.Biography;
-        doctor.UpdatedDate = DateTime.Now;
+        doctor.UpdatedDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -78,7 +85,7 @@ public class DoctorService : IDoctor
     private async Task<DoctorViewModel> InsertDoctor(UpsertDoctorRequest doctorRequest, CancellationToken cancellationToken)
     {
         var doctor = doctorRequest.Adapt<Doctor>();
-        doctor.CreatedDate = DateTime.Now;
+        doctor.CreatedDate = DateTime.UtcNow;
         await _context.Doctors.AddAsync(doctor, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         
@@ -152,11 +159,130 @@ public class DoctorService : IDoctor
                 return new ErrorModel(ErrorEnum.DoctorNotFound);
 
             doctor.Status = EntityStatus.Deleted;
-            doctor.UpdatedDate = DateTime.Now;
+            doctor.UpdatedDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);
 
             return new DoctorViewModel(doctor);
+        }
+        catch (Exception ex)
+        {
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    // Certificate Management Methods
+    public async Task<Result<CertificateViewModel>> UploadDoctorCertificate(UploadDoctorCertificateRequest request, CancellationToken cancellationToken)
+    {
+        try
+        {
+            // Verify doctor exists
+            var doctor = await _context.Doctors
+                .FirstOrDefaultAsync(d => d.Id == request.DoctorId && d.Status != EntityStatus.Deleted, cancellationToken);
+                
+            if (doctor == null)
+                return new ErrorModel(ErrorEnum.DoctorNotFound);
+
+            // Save file
+            var fileResult = await _fileService.SaveFileAsync(request.File, "doctor-certificates");
+            if (!fileResult.Success)
+                return fileResult.Error!;
+
+            // Create certificate record
+            var certificate = new DoctorCertificate
+            {
+                DoctorId = request.DoctorId,
+                FilePath = fileResult.Payload!,
+                FileType = request.FileType,
+                Category = request.CategoryId,
+                EncryptedKey = _fileService.GenerateEncryptionKey(),
+                UploadedAt = DateTime.UtcNow,
+                CreatedDate = DateTime.UtcNow,
+                Status = EntityStatus.Active
+            };
+
+            await _context.DoctorCertificates.AddAsync(certificate, cancellationToken);
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Load with includes for view model
+            var savedCertificate = await _context.DoctorCertificates
+                .Include(c => c.CertificateType)
+                .FirstAsync(c => c.Id == certificate.Id, cancellationToken);
+
+            var baseUrl = _httpContextAccessor.GetRequestPath();
+            return new CertificateViewModel(savedCertificate, baseUrl);
+        }
+        catch (Exception ex)
+        {
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    public async Task<Result<List<CertificateViewModel>>> GetDoctorCertificates(long doctorId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var doctor = await _context.Doctors
+                .FirstOrDefaultAsync(d => d.Id == doctorId && d.Status != EntityStatus.Deleted, cancellationToken);
+                
+            if (doctor == null)
+                return new ErrorModel(ErrorEnum.DoctorNotFound);
+
+            var certificates = await _context.DoctorCertificates
+                .Include(c => c.CertificateType)
+                .Where(c => c.DoctorId == doctorId && c.Status != EntityStatus.Deleted)
+                .OrderByDescending(c => c.UploadedAt)
+                .ToListAsync(cancellationToken);
+
+            var baseUrl = _httpContextAccessor.GetRequestPath();
+            var certificateViewModels = certificates.Select(c => new CertificateViewModel(c, baseUrl)).ToList();
+
+            return certificateViewModels;
+        }
+        catch (Exception ex)
+        {
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    public async Task<Result<(Stream stream, string fileName, string contentType)>> DownloadDoctorCertificate(long certificateId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var certificate = await _context.DoctorCertificates
+                .FirstOrDefaultAsync(c => c.Id == certificateId && c.Status != EntityStatus.Deleted, cancellationToken);
+                
+            if (certificate == null)
+                return new ErrorModel(ErrorEnum.CertificateNotFound);
+
+            return await _fileService.GetFileAsync(certificate.FilePath);
+        }
+        catch (Exception ex)
+        {
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    public async Task<Result<bool>> DeleteDoctorCertificate(long certificateId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var certificate = await _context.DoctorCertificates
+                .FirstOrDefaultAsync(c => c.Id == certificateId && c.Status != EntityStatus.Deleted, cancellationToken);
+                
+            if (certificate == null)
+                return new ErrorModel(ErrorEnum.CertificateNotFound);
+
+            // Soft delete from database
+            certificate.Status = EntityStatus.Deleted;
+            certificate.UpdatedDate = DateTime.UtcNow;
+            
+            await _context.SaveChangesAsync(cancellationToken);
+
+            // Delete physical file (optional - you might want to keep files for audit trail)
+            await _fileService.DeleteFileAsync(certificate.FilePath);
+
+            return true;
         }
         catch (Exception ex)
         {

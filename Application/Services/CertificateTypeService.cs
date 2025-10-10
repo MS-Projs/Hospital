@@ -1,10 +1,8 @@
-using System.Net;
 using Application.Interfaces;
 using DataAccess;
 using DataAccess.Enums;
 using DataAccess.Schemas.Public;
 using Domain.Enums;
-using Domain.Extensions;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
@@ -68,7 +66,7 @@ public class CertificateTypeService : ICertificateType
                 contractType.ValueRu = request.ValueRu;
                 contractType.ValueUz = request.ValueUz;
                 contractType.ValueUzl = request.ValueUzl;
-                contractType.UpdatedDate = DateTime.Now;
+                contractType.UpdatedDate = DateTime.UtcNow;
             }
 
             await _context.SaveChangesAsync();
@@ -126,7 +124,7 @@ public class CertificateTypeService : ICertificateType
                 return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 
             type.Status = type.Status == EntityStatus.Deleted ? EntityStatus.Active : EntityStatus.Deleted;
-            type.UpdatedDate = DateTime.Now;
+            type.UpdatedDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
            
