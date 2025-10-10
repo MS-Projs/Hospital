@@ -68,7 +68,7 @@ public class DoctorService : IDoctor
         doctor.ExperienceYears = doctorRequest.ExperienceYears;
         doctor.Workplace = doctorRequest.Workplace;
         doctor.Biography = doctorRequest.Biography;
-        doctor.UpdatedDate = DateTime.Now;
+        doctor.UpdatedDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -78,7 +78,7 @@ public class DoctorService : IDoctor
     private async Task<DoctorViewModel> InsertDoctor(UpsertDoctorRequest doctorRequest, CancellationToken cancellationToken)
     {
         var doctor = doctorRequest.Adapt<Doctor>();
-        doctor.CreatedDate = DateTime.Now;
+        doctor.CreatedDate = DateTime.UtcNow;
         await _context.Doctors.AddAsync(doctor, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         
@@ -152,7 +152,7 @@ public class DoctorService : IDoctor
                 return new ErrorModel(ErrorEnum.DoctorNotFound);
 
             doctor.Status = EntityStatus.Deleted;
-            doctor.UpdatedDate = DateTime.Now;
+            doctor.UpdatedDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);
 

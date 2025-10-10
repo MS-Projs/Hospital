@@ -1,4 +1,4 @@
-﻿using Infrastructure.Interfaces;
+using Infrastructure.Interfaces;
 using Infrastructure.Services;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Configuration;
@@ -12,8 +12,7 @@ public static class ServiceExtension
         this IServiceCollection services,
         IConfiguration configuration)
     {
-        services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
-        HttpContextExtension.Configure(services.BuildServiceProvider().GetRequiredService<IHttpContextAccessor>());
+        services.AddHttpContextAccessor();
         
         services.AddSingleton<ITokenService, TokenService>();
         return services;

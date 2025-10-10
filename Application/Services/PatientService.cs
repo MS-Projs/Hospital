@@ -68,7 +68,7 @@ public class PatientService : IPatient
         patient.Age = patientRequest.Age;
         patient.Gender = patientRequest.Gender.ToLower();
         patient.Address = patientRequest.Address;
-        patient.UpdatedDate = DateTime.Now;
+        patient.UpdatedDate = DateTime.UtcNow;
 
         await _context.SaveChangesAsync(cancellationToken);
 
@@ -78,7 +78,7 @@ public class PatientService : IPatient
     private async Task<PatientViewModel> InsertPatient(UpsertPatientRequest patientRequest, CancellationToken cancellationToken)
     {
         var patient = patientRequest.Adapt<Patient>();
-        patient.CreatedDate = DateTime.Now;
+        patient.CreatedDate = DateTime.UtcNow;
         await _context.Patients.AddAsync(patient, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
         
@@ -151,7 +151,7 @@ public class PatientService : IPatient
                 return new ErrorModel(ErrorEnum.PatientNotFound);
 
             patient.Status = EntityStatus.Deleted;
-            patient.UpdatedDate = DateTime.Now;
+            patient.UpdatedDate = DateTime.UtcNow;
 
             await _context.SaveChangesAsync(cancellationToken);
             

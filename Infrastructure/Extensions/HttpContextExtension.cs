@@ -1,19 +1,18 @@
-﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Http;
 
 namespace Infrastructure.Extensions;
 
 public static class HttpContextExtension
 {
-    private static IHttpContextAccessor _httpContextAccessor;
-
-    public static void Configure(IHttpContextAccessor httpContextAccessor)
+    public static string GetRequestPath(this HttpContext httpContext)
     {
-        _httpContextAccessor = httpContextAccessor;
+        var request = httpContext.Request;
+        return $"{request.Scheme}://{request.Host}";
     }
 
-    public static string GetRequestPath()
+    public static string GetRequestPath(this IHttpContextAccessor httpContextAccessor)
     {
-        var request = _httpContextAccessor.HttpContext?.Request;
-        return $"{request?.Scheme}://{request?.Host}";
+        var request = httpContextAccessor.HttpContext?.Request;
+        return request != null ? $"{request.Scheme}://{request.Host}" : string.Empty;
     }
 }

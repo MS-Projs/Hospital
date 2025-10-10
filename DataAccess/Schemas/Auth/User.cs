@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using DataAccess.Models;
 using DataAccess.Schemas.Public;
@@ -23,13 +23,15 @@ public class User : Entity
     [Column("email")]
     public string? Email { get; set; }
 
-    [MaxLength(200)]
+    [Required]
+    [MaxLength(500)]  // Increased size for hashed passwords
     [Column("password")]
-    public string? Password { get; set; }
+    public string Password { get; set; } = default!;
 
+    [Required]
     [MaxLength(32)]
     [Column("phone")]
-    public string? Phone { get; set; }
+    public string Phone { get; set; } = default!;
     
     
     public Patient? Patient { get; set; }
