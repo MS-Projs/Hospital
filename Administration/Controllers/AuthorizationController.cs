@@ -4,6 +4,7 @@ using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
 using Microsoft.AspNetCore.Mvc;
+using SignInResult = Domain.Models.API.Results.SignInResult;
 
 namespace Administration.Controllers;
 
@@ -18,7 +19,7 @@ public class AuthorizationController(
         await userService.SignUp(request);
 
     [HttpPost]
-    public async Task<Result<SignUpResult>>
+    public async Task<Result<SignInResult>> 
         SignIn(SignInRequest request) =>
         await userService.SignIn(request);
 }

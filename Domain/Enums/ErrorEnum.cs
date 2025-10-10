@@ -1,15 +1,23 @@
 ﻿namespace Domain.Enums;
 
-public enum ErrorEnum : short
+public enum ErrorEnum
 {
-    BadRequest = 0,
-    InternalServerError = 600,
-    PhoneAlreadyExists,
+    BadRequest,
     UserNotFound,
+    PhoneAlreadyExists,
     DoctorNotFound,
     DoctorAlreadyExist,
-    PatientAlreadyExist,
     PatientNotFound,
+    PatientAlreadyExist,
     CertificateTypeNotFound,
-    DocumentCategoryNotFound
+    AppointmentNotFound,
+    ReportNotFound,
+    DocumentNotFound,
+    CertificateNotFound,
+    FileTooLarge,
+    InvalidFileType,
+    FileNotFound,
+    UnauthorizedAccess,
+    InternalServerError
+
 }

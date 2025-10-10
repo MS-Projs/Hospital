@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Application.Interfaces;
 using Application.Services;
 using Mapster;
@@ -12,21 +12,20 @@ public static class ServiceExtension
     public static IServiceCollection AddApplication(this IServiceCollection services, IConfiguration configuration)
     {
         services
-            .AddScoped<IUserService,
-                UserService>();
-        services.AddScoped<IDoctor, DoctorService>()
+            .AddScoped<IUserService, UserService>()
             .AddScoped<IPatient, PatientService>()
-            .AddScoped<IDocumentCategory, DocumentCategoryService>()
-            .AddScoped<ICertificateType, CertificateTypeService>();
-        
+            .AddScoped<IDoctor, DoctorService>()
+            .AddScoped<ICertificateType, CertificateTypeService>()
+            .AddScoped<IAppointment, AppointmentService>()
+            .AddScoped<IReport, ReportService>();
         return services;
     }
 
-    public static void ConfigureValidator(this IServiceCollection services)
+    public static void ConfigureMapster(this IServiceCollection services)
     {
         var config = TypeAdapterConfig.GlobalSettings;
-        config.Scan(Assembly.GetExecutingAssembly()); // Ensure all mappers are loaded
-
+        config.Scan(Assembly.GetExecutingAssembly()); // Scan for mappers in this assembly
+        
         services.AddSingleton(config);
     }
 }

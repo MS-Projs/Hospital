@@ -7,5 +7,5 @@ namespace Application.Interfaces;
 public interface IUserService
 {
     Task<Result<SignUpResult>> SignUp(SignUpRequest signUpRequest);
-    Task<Result<SignUpResult>> SignIn(SignInRequest request);
+    Task<Result<SignInResult>> SignIn(SignInRequest request);
 }

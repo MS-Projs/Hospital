@@ -2,6 +2,7 @@
 using DataAccess;
 using DataAccess.Schemas.Auth;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
@@ -23,22 +24,24 @@ public class UserService(
             return new ErrorModel(ErrorEnum.PhoneAlreadyExists);
 
         var newUser = signUpRequest.Adapt<User>();
+        newUser.Password = newUser.Password.HashPassword(); // Hash password before storing
         await context.Users.AddAsync(newUser);
         await context.SaveChangesAsync();
 
         return await GenerateTokenForUser(newUser);
     }
 
-    public async Task<Result<SignUpResult>> SignIn(SignInRequest request)
+    public async Task<Result<SignInResult>> SignIn(SignInRequest request)
     {
-        var user = await context.Users.FirstOrDefaultAsync(x => x.Phone== request.Phone && x.Password == request.Password);
-        if(user == null)
+        var user = await context.Users.FirstOrDefaultAsync(x => x.Phone == request.Phone);
+        if (user == null || !request.Password.VerifyPassword(user.Password))
             return new ErrorModel(ErrorEnum.UserNotFound);
-        return await GenerateTokenForUser(user);
+        
+        var token = await GenerateTokenForUser(user);
+        return token.Adapt<SignInResult>();
     }
 
-    async private Task<SignUpResult>
-        GenerateTokenForUser(User user)
+    private async Task<SignUpResult> GenerateTokenForUser(User user)
     {
         var token = await tokenService.GenerateToken(user.Adapt<GenerateTokenParams>());
         return token.Payload.Adapt<SignUpResult>();

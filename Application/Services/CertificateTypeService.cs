@@ -1,4 +1,3 @@
-using System.Net;
 using Application.Interfaces;
 using DataAccess;
 using DataAccess.Enums;
@@ -64,11 +63,13 @@ public class CertificateTypeService : ICertificateType
 
                 if (certificateType == null)
                     return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
-                certificateType.ValueEn = request.ValueEn;
-                certificateType.ValueRu = request.ValueRu;
-                certificateType.ValueUz = request.ValueUz;
-                certificateType.ValueUzl = request.ValueUzl;
-                certificateType.UpdatedDate = DateTime.Now;
+
+                contractType.ValueEn = request.ValueEn;
+                contractType.ValueRu = request.ValueRu;
+                contractType.ValueUz = request.ValueUz;
+                contractType.ValueUzl = request.ValueUzl;
+                contractType.UpdatedDate = DateTime.UtcNow;
+
             }
 
             await _context.SaveChangesAsync();
@@ -127,7 +128,7 @@ public class CertificateTypeService : ICertificateType
                 return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 
             type.Status = type.Status == EntityStatus.Deleted ? EntityStatus.Active : EntityStatus.Deleted;
-            type.UpdatedDate = DateTime.Now;
+            type.UpdatedDate = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
            
