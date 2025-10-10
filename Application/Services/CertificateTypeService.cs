@@ -64,11 +64,11 @@ public class CertificateTypeService : ICertificateType
                 if (certificateType == null)
                     return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 
-                contractType.ValueEn = request.ValueEn;
-                contractType.ValueRu = request.ValueRu;
-                contractType.ValueUz = request.ValueUz;
-                contractType.ValueUzl = request.ValueUzl;
-                contractType.UpdatedDate = DateTime.UtcNow;
+                certificateType.ValueEn = request.ValueEn;
+                certificateType.ValueRu = request.ValueRu;
+                certificateType.ValueUz = request.ValueUz;
+                certificateType.ValueUzl = request.ValueUzl;
+                certificateType.UpdatedDate = DateTime.UtcNow;
 
             }
 

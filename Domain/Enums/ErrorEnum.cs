@@ -18,6 +18,6 @@ public enum ErrorEnum
     InvalidFileType,
     FileNotFound,
     UnauthorizedAccess,
-    InternalServerError
-
+    InternalServerError,
+    DocumentCategoryNotFound
 }
