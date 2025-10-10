@@ -15,10 +15,12 @@ public class AppointmentViewModel
     public string? Message { get; set; }
     public DateTime? PreferredDate { get; set; }
     public DateTime? ScheduledDate { get; set; }
-    public AppointmentStatus Status { get; set; }
+    public AppointmentStatus AppointmentStatus { get; set; }
     public string StatusName { get; set; } = default!;
     public DateTime CreatedDate { get; set; }
     public DateTime UpdatedDate { get; set; }
+    
+    public EntityStatus IsDeleted { get; set; }
 
     public AppointmentViewModel() { }
 
@@ -34,9 +36,11 @@ public class AppointmentViewModel
         Message = appointment.Message;
         PreferredDate = appointment.PreferredDate;
         ScheduledDate = appointment.ScheduledDate;
-        Status = appointment.Status;
+        AppointmentStatus = appointment.AppointmentStatus;
         StatusName = appointment.Status.ToString();
         CreatedDate = appointment.CreatedDate;
         UpdatedDate = appointment.UpdatedDate;
+        IsDeleted = appointment.Status;
+
     }
 }

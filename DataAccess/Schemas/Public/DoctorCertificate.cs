@@ -24,10 +24,10 @@ public class DoctorCertificate : Entity
     [Column("file_type")]
     public string FileType { get; set; } = default!;
 
-    [MaxLength(64)]
     [Column("category")]
     public long Category { get; set; }
-    [ForeignKey(nameof(CertificateType))]
+    
+    [ForeignKey(nameof(Category))]
     public CertificateType CertificateType { get; set; } = default!;
 
     [Required]

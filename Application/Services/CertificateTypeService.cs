@@ -3,6 +3,7 @@ using DataAccess;
 using DataAccess.Enums;
 using DataAccess.Schemas.Public;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
@@ -114,12 +115,11 @@ public class CertificateTypeService : ICertificateType
         }
     }
 
-    public async Task<Result<CertificateTypeViewModel>> ToggleContractTypeActivation(long contractTypeId,
-        long currentUserId)
+    public async Task<Result<CertificateTypeViewModel>> ToggleCertificateTypeActivation(long certificateTypeId, long currentUserId)
     {
         try
         {
-            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == contractTypeId);
+            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == certificateTypeId);
             if (type == null)
                 return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 
@@ -138,4 +138,20 @@ public class CertificateTypeService : ICertificateType
             return new ErrorModel(ErrorEnum.InternalServerError);
         }
     }
+
+    public Task<Result<CertificateTypeViewModel>> UpsertCertificateType(UpsertCertificateTypeRequest contractTypeRequest, long currentUserId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<CertificateTypeViewModel>> GetCertificateType(long certificateTypeId, long currentUserId)
+    {
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<PagedResult<CertificateTypeViewModel>>> GetCertificateTypes(PagedRequest request, long currentUserId)
+    {
+        throw new NotImplementedException();
+    }
+    
 }

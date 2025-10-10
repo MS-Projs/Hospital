@@ -3,7 +3,7 @@ using Domain.Models.Common;
 
 namespace Domain.Models.API.Requests;
 
-public class FilterAppointmentRequest : PagedRequest
+public record FilterAppointmentRequest : PagedRequest
 {
     public long? PatientId { get; set; }
     public long? DoctorId { get; set; }

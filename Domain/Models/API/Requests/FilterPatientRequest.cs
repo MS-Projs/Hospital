@@ -9,15 +9,14 @@ namespace Domain.Models.API.Requests;
 public record FilterPatientRequest : PagedRequest
 {
     [JsonProperty("full_name")]
-    public string FullName { get; set; } 
+    public string? FullName { get; set; } 
 
     [Range(0, 120)]
     [JsonProperty("age")]
     public int Age { get; set; }
 
-    [Required]
     [MaxLength(16)]
     [JsonProperty("gender")]
-    public string Gender { get; set; } 
+    public string? Gender { get; set; } 
     
 }

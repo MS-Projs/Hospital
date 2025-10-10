@@ -39,7 +39,7 @@ public class Appointment : Entity
     public string? Notes { get; set; }
 
     [Column("status")]
-    public AppointmentStatus Status { get; set; } = AppointmentStatus.Pending;
+    public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
     
 }
 

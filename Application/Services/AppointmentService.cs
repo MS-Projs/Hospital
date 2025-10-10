@@ -40,7 +40,7 @@ public class AppointmentService(EntityContext context) : IAppointment
                 DoctorId = request.DoctorId,
                 Message = request.Message,
                 PreferredDate = request.PreferredDate,
-                Status = AppointmentStatus.Pending,
+                AppointmentStatus =  AppointmentStatus.Pending,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow
             };
@@ -78,7 +78,7 @@ public class AppointmentService(EntityContext context) : IAppointment
             if (appointment == null)
                 return new ErrorModel(ErrorEnum.AppointmentNotFound);
 
-            appointment.Status = request.Status;
+            appointment.AppointmentStatus = request.Status;
             appointment.Notes = request.Notes;
             appointment.ScheduledDate = request.ScheduledDate;
             appointment.UpdatedDate = DateTime.UtcNow;
@@ -134,7 +134,7 @@ public class AppointmentService(EntityContext context) : IAppointment
                 query = query.Where(a => a.DoctorId == request.DoctorId.Value);
 
             if (request.Status.HasValue)
-                query = query.Where(a => a.Status == request.Status.Value);
+                query = query.Where(a => a.AppointmentStatus == request.Status.Value);
 
             if (request.FromDate.HasValue)
                 query = query.Where(a => a.CreatedDate >= request.FromDate.Value);
@@ -168,7 +168,7 @@ public class AppointmentService(EntityContext context) : IAppointment
             if (appointment == null)
                 return new ErrorModel(ErrorEnum.AppointmentNotFound);
 
-            appointment.Status = AppointmentStatus.Rejected;
+            appointment.AppointmentStatus = AppointmentStatus.Rejected;
             appointment.UpdatedDate = DateTime.UtcNow;
 
             await context.SaveChangesAsync(cancellationToken);

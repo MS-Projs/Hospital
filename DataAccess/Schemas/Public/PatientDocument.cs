@@ -25,10 +25,10 @@ public class PatientDocument : Entity
     [Column("file_type")]
     public string FileType { get; set; } = default!; // MR, Tahlil, Recept
 
-    [MaxLength(64)]
     [Column("category")]
     public long? Category { get; set; }
-    [ForeignKey(nameof(DocumentCategory))]
+    
+    [ForeignKey(nameof(Category))]
     public DocumentCategory DocumentCategory { get; set; } = default!;
 
     [Required]
