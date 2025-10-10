@@ -3,6 +3,7 @@ using DataAccess;
 using DataAccess.Enums;
 using DataAccess.Schemas.Public;
 using Domain.Enums;
+using Domain.Extensions;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;

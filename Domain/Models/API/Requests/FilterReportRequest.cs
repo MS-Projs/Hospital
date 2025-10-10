@@ -2,7 +2,7 @@ using Domain.Models.Common;
 
 namespace Domain.Models.API.Requests;
 
-public class FilterReportRequest : PagedRequest
+public record FilterReportRequest : PagedRequest
 {
     public long? PatientId { get; set; }
     public long? DoctorId { get; set; }
