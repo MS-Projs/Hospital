@@ -20,7 +20,7 @@ public class CertificateTypeService : ICertificateType
         _context = context;
     }
 
-    public async Task<Result<CertificateTypeViewModel>> UpsertContractType(UpsertCertificateTypeRequest request,
+    public async Task<Result<CertificateTypeViewModel>> UpsertCertificateType(UpsertCertificateTypeRequest request,
         long currentUserId)
     {
         try
@@ -39,7 +39,7 @@ public class CertificateTypeService : ICertificateType
                 || !string.IsNullOrEmpty(request.ValueUzl))
                 return new ErrorModel(ErrorEnum.BadRequest);
 
-            CertificateType? contractType;
+            CertificateType? certificateType;
 
             if (request.Id == 0)
             {
@@ -47,7 +47,7 @@ public class CertificateTypeService : ICertificateType
                     .FirstOrDefaultAsync(ct => ct.KeyWord == request.KeyWord);
                 if (existingGroup != null)
                     return new ErrorModel(ErrorEnum.BadRequest);
-                contractType = new CertificateType
+                certificateType = new CertificateType
                 {
                     KeyWord = request.KeyWord,
                     ValueEn = request.ValueEn,
@@ -55,25 +55,27 @@ public class CertificateTypeService : ICertificateType
                     ValueUz = request.ValueUz,
                     ValueUzl = request.ValueUzl
                 };
-                await _context.CertificateTypes.AddAsync(contractType);
+                await _context.CertificateTypes.AddAsync(certificateType);
             }
             else
             {
-                contractType = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == request.Id);
+                certificateType = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == request.Id);
 
-                if (contractType == null)
+                if (certificateType == null)
                     return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
+
                 contractType.ValueEn = request.ValueEn;
                 contractType.ValueRu = request.ValueRu;
                 contractType.ValueUz = request.ValueUz;
                 contractType.ValueUzl = request.ValueUzl;
                 contractType.UpdatedDate = DateTime.UtcNow;
+
             }
 
             await _context.SaveChangesAsync();
 
 
-            return new CertificateTypeViewModel(contractType);
+            return new CertificateTypeViewModel(certificateType);
         }
         catch (Exception ex)
         {
@@ -81,11 +83,11 @@ public class CertificateTypeService : ICertificateType
         }
     }
 
-    public async Task<Result<CertificateTypeViewModel>> GetType(long contractTypeId, long currentUserId)
+    public async Task<Result<CertificateTypeViewModel>> GetType(long certificateTypeId, long currentUserId)
     {
         try
         {
-            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == contractTypeId);
+            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == certificateTypeId);
             if (type == null)
                 return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 
@@ -114,13 +116,14 @@ public class CertificateTypeService : ICertificateType
             return new ErrorModel(ErrorEnum.InternalServerError);
         }
     }
+    
 
-    public async Task<Result<CertificateTypeViewModel>> ToggleContractTypeActivation(long contractTypeId,
+    public async Task<Result<CertificateTypeViewModel>> ToggleCertificateTypeActivation(long certificateTypeId,
         long currentUserId)
     {
         try
         {
-            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == contractTypeId);
+            var type = await _context.CertificateTypes.FirstOrDefaultAsync(ct => ct.Id == certificateTypeId);
             if (type == null)
                 return new ErrorModel(ErrorEnum.CertificateTypeNotFound);
 

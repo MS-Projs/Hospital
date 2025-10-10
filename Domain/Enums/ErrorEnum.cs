@@ -19,4 +19,5 @@ public enum ErrorEnum
     FileNotFound,
     UnauthorizedAccess,
     InternalServerError
+
 }

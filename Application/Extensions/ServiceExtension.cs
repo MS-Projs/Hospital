@@ -1,4 +1,4 @@
-﻿using System.Reflection;
+using System.Reflection;
 using Application.Interfaces;
 using Application.Services;
 using Mapster;

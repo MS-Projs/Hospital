@@ -6,12 +6,12 @@ namespace Administration.Helpers;
 
 public class MyController<T> : ControllerBase
 {
-    protected Guid UserId => GetUserId();
+    protected long UserId => GetUserId();
 
-    private Guid GetUserId()
+    private long GetUserId()
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
                      User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        return Guid.Parse(userId ?? string.Empty);
+        return long.Parse(userId ?? string.Empty);
     }
 }
