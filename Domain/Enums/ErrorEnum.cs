@@ -19,5 +19,7 @@ public enum ErrorEnum
     FileNotFound,
     UnauthorizedAccess,
     InternalServerError,
-    DocumentCategoryNotFound
+    DocumentCategoryNotFound,
+    ProfilePhotoNotFound,
+    InvalidCurrentPassword
 }

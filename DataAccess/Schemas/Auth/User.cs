@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using DataAccess.Enums;
 using DataAccess.Models;
 using DataAccess.Schemas.Public;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +17,7 @@ public class User : Entity
     [Column("first_name")]
     public string FirstName { get; set; } = null!;
 
+    [MaxLength(100)]
     [Column("last_name")]
     public string? LastName { get; set; }
 
@@ -24,7 +26,7 @@ public class User : Entity
     public string? Email { get; set; }
 
     [Required]
-    [MaxLength(500)]  // Increased size for hashed passwords
+    [MaxLength(500)]
     [Column("password")]
     public string Password { get; set; } = default!;
 
@@ -32,8 +34,22 @@ public class User : Entity
     [MaxLength(32)]
     [Column("phone")]
     public string Phone { get; set; } = default!;
-    
-    
+
+    [Column("date_of_birth")]
+    public DateTime? DateOfBirth { get; set; }
+
+    [Column("gender")]
+    public Gender? Gender { get; set; }
+
+    [MaxLength(500)]
+    [Column("address")]
+    public string? Address { get; set; }
+
+    [MaxLength(500)]
+    [Column("profile_photo_path")]
+    public string? ProfilePhotoPath { get; set; }
+
+    // Navigation properties
     public Patient? Patient { get; set; }
     public Doctor? Doctor { get; set; }
 }

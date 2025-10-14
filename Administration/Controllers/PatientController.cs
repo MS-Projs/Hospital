@@ -86,4 +86,70 @@ public class PatientController : MyController<PatientController>
     }
 
     #endregion
+
+    #region Patient Document Management
+
+    /// <summary>
+    /// Upload a document for a patient
+    /// </summary>
+    /// <param name="request">Document upload request containing patient ID, file, and metadata</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Uploaded document details</returns>
+    [HttpPost("upload-document")]
+    public async Task<Result<DocumentViewModel>> UploadDocument(
+        [FromForm] UploadPatientDocumentRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await _patientService.UploadPatientDocument(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Get all documents for a specific patient
+    /// </summary>
+    /// <param name="patientId">Patient ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>List of patient documents</returns>
+    [HttpGet("documents")]
+    public async Task<Result<List<DocumentViewModel>>> GetDocuments(
+        [FromQuery] long patientId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _patientService.GetPatientDocuments(patientId, cancellationToken);
+    }
+
+    /// <summary>
+    /// Download a specific patient document
+    /// </summary>
+    /// <param name="documentId">Document ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Document file stream</returns>
+    [HttpGet("download-document")]
+    public async Task<IActionResult> DownloadDocument(
+        [FromQuery] long documentId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _patientService.DownloadPatientDocument(documentId, cancellationToken);
+
+        if (!result.Success)
+            return BadRequest(result.Error);
+
+        var (stream, fileName, contentType) = result.Payload!;
+        return File(stream, contentType, fileName);
+    }
+
+    /// <summary>
+    /// Delete a patient document (soft delete)
+    /// </summary>
+    /// <param name="documentId">Document ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Success status</returns>
+    [HttpDelete("document")]
+    public async Task<Result<bool>> DeleteDocument(
+        [FromQuery] long documentId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _patientService.DeletePatientDocument(documentId, cancellationToken);
+    }
+
+    #endregion
 }

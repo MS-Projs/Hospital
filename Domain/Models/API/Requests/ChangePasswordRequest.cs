@@ -6,6 +6,10 @@ namespace Domain.Models.API.Requests;
 public class ChangePasswordRequest
 {
     [Required]
+    [JsonProperty("user_id")]
+    public long UserId { get; set; }
+    
+    [Required]
     [JsonProperty("current_password")]
     public string CurrentPassword { get; set; } = default!;
 
