@@ -1,32 +1,44 @@
 using Administration.Extensions;
 using Application.Validators;
+using Application.Validators.Auth;
 using FluentValidation;
 using FluentValidation.AspNetCore;
+using MediatR;
+using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
-using Microsoft.OpenApi.Models;
 
 var logger = LogManager
     .Setup()
     .LoadConfigurationFromFile("nlog.config")
     .GetCurrentClassLogger();
+
 try
 {
     var builder = WebApplication.CreateBuilder(args);
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
+
     ServiceExtension.RegisterMapsterConfiguration();
+
     builder.Services
         .AddAuthentication(builder.Configuration)
         .RegisterServices(builder.Configuration);
-    builder.Services.AddControllers();
-    builder.Services.AddValidatorsFromAssemblyContaining<SignUpRequestValidator>();
-    builder.Services.AddFluentValidationAutoValidation();
 
+    // 🚀 FluentValidation avtomatik integratsiyasi
+    builder.Services
+        .AddControllers()
+        .AddFluentValidation(fv =>
+        {
+            // Barcha validatorlarni avtomatik yuklab oladi
+            fv.RegisterValidatorsFromAssembly(typeof(SignUpRequestValidator).Assembly);
+            fv.ImplicitlyValidateChildProperties = true;
+            fv.ImplicitlyValidateRootCollectionElements = true;
+        });
 
     builder.Services.AddEndpointsApiExplorer();
 
-    // Swagger konfiguratsiyasi JWT autentifikatsiya bilan
+    // Swagger konfiguratsiyasi
     builder.Services.AddSwaggerGen(options =>
     {
         options.SwaggerDoc("v1", new OpenApiInfo
@@ -36,7 +48,6 @@ try
             Description = "API documentation for Administration service"
         });
 
-        // JWT Bearer token qo'shish
         options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Name = "Authorization",
@@ -44,7 +55,7 @@ try
             Scheme = "Bearer",
             BearerFormat = "JWT",
             In = ParameterLocation.Header,
-            Description = "JWT Authorization header using the Bearer scheme. Enter 'Bearer' [space] and then your token in the text input below."
+            Description = "JWT Authorization header using the Bearer scheme."
         });
 
         options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -61,19 +72,6 @@ try
                 Array.Empty<string>()
             }
         });
-
-        // XML hujjatlarni qo'shish (ixtiyoriy)
-        // var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
-        // var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
-        // options.IncludeXmlComments(xmlPath);
-    });
-
-    // Enable serving static files from wwwroot folder
-    builder.Services.AddDirectoryBrowser();
-    // Configure static file options
-    builder.Services.Configure<StaticFileOptions>(options =>
-    {
-        options.ServeUnknownFileTypes = true; // Serve all file types
     });
 
     var app = builder.Build();
@@ -83,7 +81,7 @@ try
     app.UseSwaggerUI(options =>
     {
         options.SwaggerEndpoint("/swagger/v1/swagger.json", "Administration API v1");
-        options.RoutePrefix = "swagger"; // https://localhost:port/swagger
+        options.RoutePrefix = "swagger";
     });
 
     app.UseHttpsRedirection();

@@ -12,7 +12,7 @@ public class BasicViewModelLocalized : LocalizedViewModel
     public DateTime CreatedDate { get; set; }
 
     [JsonProperty("updatedDate")]
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 
     public BasicViewModelLocalized() : base() { }
 

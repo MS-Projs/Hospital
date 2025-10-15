@@ -28,6 +28,7 @@ public static class ServiceExtension
     public static IServiceCollection AddAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
         services.Configure<JwtOptions>(configuration.GetSection(JwtOptions.SectionName));
+        Application.Extensions.ServiceExtension.ConfigureFluentValidator();
         services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme).AddJwtBearer(options =>
         {
             var jwtOptions = configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()!;

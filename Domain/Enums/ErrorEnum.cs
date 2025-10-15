@@ -21,5 +21,7 @@ public enum ErrorEnum
     InternalServerError,
     DocumentCategoryNotFound,
     ProfilePhotoNotFound,
-    InvalidCurrentPassword
+    InvalidCurrentPassword,
+    ValidationError,
+    InvalidInputParams
 }

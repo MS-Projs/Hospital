@@ -12,7 +12,7 @@ public class Entity
     public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
     [Column("updated_date")]
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
 
     [Column("status")]
     public EntityStatus Status { get; set; }

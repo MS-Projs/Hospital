@@ -39,7 +39,7 @@ public class User : Entity
     public DateTime? DateOfBirth { get; set; }
 
     [Column("gender")]
-    public Gender? Gender { get; set; }
+    public Gender Gender { get; set; }
 
     [MaxLength(500)]
     [Column("address")]

@@ -1,7 +1,7 @@
 ﻿using Domain.Models.API.Requests;
 using FluentValidation;
 
-namespace Application.Validators;
+namespace Application.Validators.Auth;
 
 public class SignUpRequestValidator : AbstractValidator<SignUpRequest>
 {
@@ -17,8 +17,8 @@ public class SignUpRequestValidator : AbstractValidator<SignUpRequest>
 
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required")
-            .Matches(@"^\+?[1-9]\d{1,14}$").WithMessage("Invalid phone number format");
-
+            .Matches(@"^\+998\d{9}$").WithMessage("Invalid Uzbekistan phone number format");
+       
         RuleFor(x => x.Password)
             .NotEmpty().WithMessage("Password is required")
             .MinimumLength(6).WithMessage("Password must be at least 6 characters long")
@@ -28,3 +28,5 @@ public class SignUpRequestValidator : AbstractValidator<SignUpRequest>
             .Matches(@"[A-Z]").WithMessage("Password must contain at least one uppercase letter");
     }
 }
+
+

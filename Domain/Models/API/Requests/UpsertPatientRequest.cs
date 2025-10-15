@@ -13,9 +13,6 @@ public class UpsertPatientRequest
     [JsonProperty("user_id")]
     public long UserId { get; set; }
 
-    [ForeignKey(nameof(UserId))]
-    public User User { get; set; } = default!;
-
     [Required]
     [MaxLength(200)]
     [JsonProperty("full_name")]

@@ -19,7 +19,7 @@ public class AppointmentViewModel
     public AppointmentStatus Status { get; set; }
     public string StatusName { get; set; } = default!;
     public DateTime CreatedDate { get; set; }
-    public DateTime UpdatedDate { get; set; }
+    public DateTime? UpdatedDate { get; set; }
     
     public EntityStatus IsDeleted { get; set; }
 
