@@ -26,8 +26,8 @@ public class DoctorCertificate : Entity
 
     [MaxLength(64)]
     [Column("category")]
-    public long Category { get; set; }
-    [ForeignKey(nameof(CertificateType))]
+    public long CertificateTypeId { get; set; }
+    [ForeignKey(nameof(CertificateTypeId))]
     public CertificateType CertificateType { get; set; } = default!;
 
     [Required]

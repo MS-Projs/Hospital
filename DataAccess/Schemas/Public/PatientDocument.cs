@@ -26,9 +26,9 @@ public class PatientDocument : Entity
     public string FileType { get; set; } = default!; // MR, Tahlil, Recept
 
     [MaxLength(64)]
-    [Column("category")]
-    public long? Category { get; set; }
-    [ForeignKey(nameof(DocumentCategory))]
+    [Column("document_category_id")]
+    public long? DocumentCategoryId { get; set; }
+    [ForeignKey(nameof(DocumentCategoryId))]
     public DocumentCategory DocumentCategory { get; set; } = default!;
 
     [Required]

@@ -13,5 +13,7 @@ public class CreateAppointmentRequest
     [MaxLength(500)]
     public string? Message { get; set; }
 
-    public DateTime? PreferredDate { get; set; }
+    public DateTime? ScheduledDate { get; set; }
+    
+    public int Duration { get; set; }
 }

@@ -13,8 +13,9 @@ public class AppointmentViewModel
     public string DoctorName { get; set; } = default!;
     public string DoctorSpecialization { get; set; } = default!;
     public string? Message { get; set; }
-    public DateTime? PreferredDate { get; set; }
     public DateTime? ScheduledDate { get; set; }
+    
+    public int Duration { get; set; }
     public AppointmentStatus Status { get; set; }
     public string StatusName { get; set; } = default!;
     public DateTime CreatedDate { get; set; }
@@ -34,8 +35,8 @@ public class AppointmentViewModel
         DoctorName = appointment.Doctor?.FullName ?? "";
         DoctorSpecialization = appointment.Doctor?.Specialization ?? "";
         Message = appointment.Message;
-        PreferredDate = appointment.PreferredDate;
         ScheduledDate = appointment.ScheduledDate;
+        Duration = appointment.Duration;
         Status = appointment.AppointmentStatus;
         StatusName = appointment.Status.ToString();
         CreatedDate = appointment.CreatedDate;

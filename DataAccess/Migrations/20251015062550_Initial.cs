@@ -19,6 +19,46 @@ namespace DataAccess.Migrations
                 name: "auth");
 
             migrationBuilder.CreateTable(
+                name: "CertificateTypes",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    keyword = table.Column<string>(type: "varchar(40)", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<byte>(type: "smallint", nullable: false),
+                    value_ru = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_uz = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_uzl = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_en = table.Column<string>(type: "varchar(200)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_CertificateTypes", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "DocumentCategories",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    keyword = table.Column<string>(type: "varchar(40)", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<byte>(type: "smallint", nullable: false),
+                    value_ru = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_uz = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_uzl = table.Column<string>(type: "varchar(200)", nullable: false),
+                    value_en = table.Column<string>(type: "varchar(200)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_DocumentCategories", x => x.id);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "users",
                 schema: "auth",
                 columns: table => new
@@ -26,12 +66,16 @@ namespace DataAccess.Migrations
                     id = table.Column<long>(type: "bigint", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     first_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: false),
-                    last_name = table.Column<string>(type: "text", nullable: true),
+                    last_name = table.Column<string>(type: "character varying(100)", maxLength: 100, nullable: true),
                     email = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    password = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
-                    phone = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: true),
+                    password = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: false),
+                    phone = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    date_of_birth = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    gender = table.Column<int>(type: "integer", nullable: true),
+                    address = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    profile_photo_path = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
@@ -53,7 +97,7 @@ namespace DataAccess.Migrations
                     workplace = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     biography = table.Column<string>(type: "text", nullable: true),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
@@ -82,7 +126,7 @@ namespace DataAccess.Migrations
                     address = table.Column<string>(type: "character varying(200)", maxLength: 200, nullable: true),
                     additional_notes = table.Column<string>(type: "text", nullable: true),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
@@ -108,7 +152,7 @@ namespace DataAccess.Migrations
                     code = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: false),
                     expire_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
@@ -124,6 +168,41 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
+                name: "doctor_certificates",
+                schema: "public",
+                columns: table => new
+                {
+                    id = table.Column<long>(type: "bigint", nullable: false)
+                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    doctor_id = table.Column<long>(type: "bigint", nullable: false),
+                    file_path = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
+                    file_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
+                    category = table.Column<long>(type: "bigint", maxLength: 64, nullable: false),
+                    encrypted_key = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
+                    uploaded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<byte>(type: "smallint", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_doctor_certificates", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_doctor_certificates_CertificateTypes_category",
+                        column: x => x.category,
+                        principalTable: "CertificateTypes",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_doctor_certificates_doctors_doctor_id",
+                        column: x => x.doctor_id,
+                        principalSchema: "public",
+                        principalTable: "doctors",
+                        principalColumn: "id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
                 name: "appointments",
                 schema: "public",
                 columns: table => new
@@ -134,10 +213,12 @@ namespace DataAccess.Migrations
                     doctor_id = table.Column<long>(type: "bigint", nullable: false),
                     message = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     preferred_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<byte>(type: "smallint", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    scheduled_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
+                    appointment_status = table.Column<byte>(type: "smallint", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
+                    status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -159,35 +240,6 @@ namespace DataAccess.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "doctor_certificates",
-                schema: "public",
-                columns: table => new
-                {
-                    id = table.Column<long>(type: "bigint", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    patient_id = table.Column<long>(type: "bigint", nullable: false),
-                    file_path = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
-                    file_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    category = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
-                    encrypted_key = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
-                    uploaded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    status = table.Column<byte>(type: "smallint", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_doctor_certificates", x => x.id);
-                    table.ForeignKey(
-                        name: "FK_doctor_certificates_patients_patient_id",
-                        column: x => x.patient_id,
-                        principalSchema: "public",
-                        principalTable: "patients",
-                        principalColumn: "id",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "patient_documents",
                 schema: "public",
                 columns: table => new
@@ -197,16 +249,21 @@ namespace DataAccess.Migrations
                     patient_id = table.Column<long>(type: "bigint", nullable: false),
                     file_path = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
                     file_type = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    category = table.Column<string>(type: "character varying(64)", maxLength: 64, nullable: true),
+                    document_category_id = table.Column<long>(type: "bigint", maxLength: 64, nullable: true),
                     encrypted_key = table.Column<string>(type: "character varying(512)", maxLength: 512, nullable: false),
                     uploaded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_patient_documents", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_patient_documents_DocumentCategories_document_category_id",
+                        column: x => x.document_category_id,
+                        principalTable: "DocumentCategories",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_patient_documents_patients_patient_id",
                         column: x => x.patient_id,
@@ -226,15 +283,23 @@ namespace DataAccess.Migrations
                     patient_id = table.Column<long>(type: "bigint", nullable: false),
                     doctor_id = table.Column<long>(type: "bigint", nullable: false),
                     report_text = table.Column<string>(type: "text", nullable: false),
-                    pdf_path = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: false),
+                    pdf_path = table.Column<string>(type: "character varying(400)", maxLength: 400, nullable: true),
+                    appointment_id = table.Column<long>(type: "bigint", nullable: true),
+                    notes = table.Column<string>(type: "character varying(500)", maxLength: 500, nullable: true),
                     report_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     created_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
+                    updated_date = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     status = table.Column<byte>(type: "smallint", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_reports", x => x.id);
+                    table.ForeignKey(
+                        name: "FK_reports_appointments_appointment_id",
+                        column: x => x.appointment_id,
+                        principalSchema: "public",
+                        principalTable: "appointments",
+                        principalColumn: "id");
                     table.ForeignKey(
                         name: "FK_reports_doctors_doctor_id",
                         column: x => x.doctor_id,
@@ -270,10 +335,16 @@ namespace DataAccess.Migrations
                 column: "status");
 
             migrationBuilder.CreateIndex(
-                name: "IX_doctor_certificates_patient_id",
+                name: "IX_doctor_certificates_category",
                 schema: "public",
                 table: "doctor_certificates",
-                column: "patient_id");
+                column: "category");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_doctor_certificates_doctor_id",
+                schema: "public",
+                table: "doctor_certificates",
+                column: "doctor_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_doctors_user_id",
@@ -281,6 +352,12 @@ namespace DataAccess.Migrations
                 table: "doctors",
                 column: "user_id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_patient_documents_document_category_id",
+                schema: "public",
+                table: "patient_documents",
+                column: "document_category_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_patient_documents_patient_id",
@@ -294,6 +371,12 @@ namespace DataAccess.Migrations
                 table: "patients",
                 column: "user_id",
                 unique: true);
+
+            migrationBuilder.CreateIndex(
+                name: "IX_reports_appointment_id",
+                schema: "public",
+                table: "reports",
+                column: "appointment_id");
 
             migrationBuilder.CreateIndex(
                 name: "IX_reports_doctor_id",
@@ -339,10 +422,6 @@ namespace DataAccess.Migrations
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "appointments",
-                schema: "public");
-
-            migrationBuilder.DropTable(
                 name: "doctor_certificates",
                 schema: "public");
 
@@ -357,6 +436,16 @@ namespace DataAccess.Migrations
             migrationBuilder.DropTable(
                 name: "sessions",
                 schema: "auth");
+
+            migrationBuilder.DropTable(
+                name: "CertificateTypes");
+
+            migrationBuilder.DropTable(
+                name: "DocumentCategories");
+
+            migrationBuilder.DropTable(
+                name: "appointments",
+                schema: "public");
 
             migrationBuilder.DropTable(
                 name: "doctors",

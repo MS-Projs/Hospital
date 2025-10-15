@@ -15,4 +15,6 @@ public class UpdateAppointmentStatusRequest
     public string? Notes { get; set; }
 
     public DateTime? ScheduledDate { get; set; }
+    
+    public int Duration { get; set; }
 }

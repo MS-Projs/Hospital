@@ -28,9 +28,6 @@ public class Appointment : Entity
     [Column("message")]
     public string? Message { get; set; }
 
-    [Column("preferred_date")]
-    public DateTime? PreferredDate { get; set; }
-
     [Column("scheduled_date")]
     public DateTime? ScheduledDate { get; set; }
 
@@ -38,7 +35,10 @@ public class Appointment : Entity
     [Column("notes")]
     public string? Notes { get; set; }
 
-    [Column("status")]
+    [Column("duration")]
+    public int Duration { get; set; } //minutes 20 60 80 120D
+    
+    [Column("appointment_status")]
     public AppointmentStatus AppointmentStatus { get; set; } = AppointmentStatus.Pending;
     
 }

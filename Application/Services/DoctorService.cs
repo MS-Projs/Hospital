@@ -194,7 +194,7 @@ public class DoctorService : IDoctor
                 DoctorId = request.DoctorId,
                 FilePath = fileResult.Payload!,
                 FileType = request.FileType,
-                Category = request.CategoryId,
+                CertificateTypeId = request.CategoryId,
                 EncryptedKey = _fileService.GenerateEncryptionKey(),
                 UploadedAt = DateTime.UtcNow,
                 CreatedDate = DateTime.UtcNow,

@@ -12,15 +12,15 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace DataAccess.Migrations
 {
     [DbContext(typeof(EntityContext))]
-    [Migration("20250903063543_Initial")]
-    partial class Initial
+    [Migration("20251015064122_add fielt for appointment")]
+    partial class addfieltforappointment
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "9.0.8")
+                .HasAnnotation("ProductVersion", "9.0.10")
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
@@ -52,7 +52,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -79,9 +79,18 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("Address")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("address");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
+
+                    b.Property<DateTime?>("DateOfBirth")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("date_of_birth");
 
                     b.Property<string>("Email")
                         .HasMaxLength(200)
@@ -94,25 +103,37 @@ namespace DataAccess.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("first_name");
 
+                    b.Property<int?>("Gender")
+                        .HasColumnType("integer")
+                        .HasColumnName("gender");
+
                     b.Property<string>("LastName")
-                        .HasColumnType("text")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("last_name");
 
                     b.Property<string>("Password")
-                        .HasMaxLength(200)
-                        .HasColumnType("character varying(200)")
+                        .IsRequired()
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
                         .HasColumnName("password");
 
                     b.Property<string>("Phone")
+                        .IsRequired()
                         .HasMaxLength(32)
                         .HasColumnType("character varying(32)")
                         .HasColumnName("phone");
+
+                    b.Property<string>("ProfilePhotoPath")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("profile_photo_path");
 
                     b.Property<byte>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -136,9 +157,9 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
-                        .HasColumnName("created_at");
+                    b.Property<byte>("AppointmentStatus")
+                        .HasColumnType("smallint")
+                        .HasColumnName("appointment_status");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -148,10 +169,19 @@ namespace DataAccess.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("doctor_id");
 
+                    b.Property<int>("Duration")
+                        .HasColumnType("integer")
+                        .HasColumnName("duration");
+
                     b.Property<string>("Message")
                         .HasMaxLength(500)
                         .HasColumnType("character varying(500)")
                         .HasColumnName("message");
+
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
 
                     b.Property<long>("PatientId")
                         .HasColumnType("bigint")
@@ -161,11 +191,15 @@ namespace DataAccess.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("preferred_date");
 
+                    b.Property<DateTime?>("ScheduledDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_date");
+
                     b.Property<byte>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -178,6 +212,57 @@ namespace DataAccess.Migrations
                     b.HasIndex("Status");
 
                     b.ToTable("appointments", "public");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.CertificateType", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("KeyWord")
+                        .IsRequired()
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("keyword");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.Property<string>("ValueEn")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_en");
+
+                    b.Property<string>("ValueRu")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_ru");
+
+                    b.Property<string>("ValueUz")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_uz");
+
+                    b.Property<string>("ValueUzl")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_uzl");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("CertificateTypes");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Doctor", b =>
@@ -217,7 +302,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -247,14 +332,18 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Category")
+                    b.Property<long>("CertificateTypeId")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("bigint")
                         .HasColumnName("category");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
+
+                    b.Property<long>("DoctorId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("doctor_id");
 
                     b.Property<string>("EncryptedKey")
                         .IsRequired()
@@ -274,15 +363,11 @@ namespace DataAccess.Migrations
                         .HasColumnType("character varying(32)")
                         .HasColumnName("file_type");
 
-                    b.Property<long>("PatientId")
-                        .HasColumnType("bigint")
-                        .HasColumnName("patient_id");
-
                     b.Property<byte>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -292,9 +377,62 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("PatientId");
+                    b.HasIndex("CertificateTypeId");
+
+                    b.HasIndex("DoctorId");
 
                     b.ToTable("doctor_certificates", "public");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DocumentCategory", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("KeyWord")
+                        .IsRequired()
+                        .HasColumnType("varchar(40)")
+                        .HasColumnName("keyword");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.Property<string>("ValueEn")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_en");
+
+                    b.Property<string>("ValueRu")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_ru");
+
+                    b.Property<string>("ValueUz")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_uz");
+
+                    b.Property<string>("ValueUzl")
+                        .IsRequired()
+                        .HasColumnType("varchar(200)")
+                        .HasColumnName("value_uzl");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("DocumentCategories");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Patient", b =>
@@ -339,7 +477,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -364,14 +502,14 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
-                    b.Property<string>("Category")
-                        .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
-                        .HasColumnName("category");
-
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
+
+                    b.Property<long?>("DocumentCategoryId")
+                        .HasMaxLength(64)
+                        .HasColumnType("bigint")
+                        .HasColumnName("document_category_id");
 
                     b.Property<string>("EncryptedKey")
                         .IsRequired()
@@ -399,7 +537,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -408,6 +546,8 @@ namespace DataAccess.Migrations
                         .HasColumnName("uploaded_at");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("DocumentCategoryId");
 
                     b.HasIndex("PatientId");
 
@@ -423,6 +563,10 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<long?>("AppointmentId")
+                        .HasColumnType("bigint")
+                        .HasColumnName("appointment_id");
+
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_date");
@@ -431,12 +575,16 @@ namespace DataAccess.Migrations
                         .HasColumnType("bigint")
                         .HasColumnName("doctor_id");
 
+                    b.Property<string>("Notes")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("notes");
+
                     b.Property<long>("PatientId")
                         .HasColumnType("bigint")
                         .HasColumnName("patient_id");
 
                     b.Property<string>("PdfPath")
-                        .IsRequired()
                         .HasMaxLength(400)
                         .HasColumnType("character varying(400)")
                         .HasColumnName("pdf_path");
@@ -454,11 +602,13 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime?>("UpdatedDate")
+                    b.Property<DateTime>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("AppointmentId");
 
                     b.HasIndex("DoctorId");
 
@@ -510,13 +660,21 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Schemas.Public.DoctorCertificate", b =>
                 {
-                    b.HasOne("DataAccess.Schemas.Public.Patient", "Patient")
+                    b.HasOne("DataAccess.Schemas.Public.CertificateType", "CertificateType")
                         .WithMany()
-                        .HasForeignKey("PatientId")
+                        .HasForeignKey("CertificateTypeId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.Navigation("Patient");
+                    b.HasOne("DataAccess.Schemas.Public.Doctor", "Doctor")
+                        .WithMany()
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("CertificateType");
+
+                    b.Navigation("Doctor");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Patient", b =>
@@ -532,17 +690,27 @@ namespace DataAccess.Migrations
 
             modelBuilder.Entity("DataAccess.Schemas.Public.PatientDocument", b =>
                 {
+                    b.HasOne("DataAccess.Schemas.Public.DocumentCategory", "DocumentCategory")
+                        .WithMany()
+                        .HasForeignKey("DocumentCategoryId");
+
                     b.HasOne("DataAccess.Schemas.Public.Patient", "Patient")
                         .WithMany()
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("DocumentCategory");
+
                     b.Navigation("Patient");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Report", b =>
                 {
+                    b.HasOne("DataAccess.Schemas.Public.Appointment", "Appointment")
+                        .WithMany()
+                        .HasForeignKey("AppointmentId");
+
                     b.HasOne("DataAccess.Schemas.Public.Doctor", "Doctor")
                         .WithMany()
                         .HasForeignKey("DoctorId")
@@ -554,6 +722,8 @@ namespace DataAccess.Migrations
                         .HasForeignKey("PatientId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Appointment");
 
                     b.Navigation("Doctor");
 

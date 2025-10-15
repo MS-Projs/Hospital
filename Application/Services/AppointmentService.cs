@@ -39,7 +39,8 @@ public class AppointmentService(EntityContext context) : IAppointment
                 PatientId = request.PatientId,
                 DoctorId = request.DoctorId,
                 Message = request.Message,
-                PreferredDate = request.PreferredDate,
+                ScheduledDate = request.ScheduledDate,
+                Duration = request.Duration,
                 AppointmentStatus = AppointmentStatus.Pending,
                 CreatedDate = DateTime.UtcNow,
                 UpdatedDate = DateTime.UtcNow
@@ -81,6 +82,7 @@ public class AppointmentService(EntityContext context) : IAppointment
             appointment.AppointmentStatus = request.Status;
             appointment.Notes = request.Notes;
             appointment.ScheduledDate = request.ScheduledDate;
+            appointment.Duration = request.Duration;
             appointment.UpdatedDate = DateTime.UtcNow;
 
             await context.SaveChangesAsync(cancellationToken);

@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
+using FluentValidation;
 using Microsoft.AspNetCore.Mvc;
 using SignInResult = Domain.Models.API.Results.SignInResult;
 
@@ -10,9 +11,16 @@ namespace Administration.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
-public class AuthorizationController(
-    IUserService _userService) : MyController<AuthorizationController>
+public class AuthorizationController: MyController<AuthorizationController>
 {
+    private readonly IValidator<SignUpRequest> _validator;
+    private readonly IUserService _userService;
+    public AuthorizationController(IUserService userService,
+        IValidator<SignUpRequest> validator)
+    {
+        _userService = userService;
+        _validator = validator;
+    }
     [HttpPost]
     public async Task<Result<SignUpResult>>
         SignUp(SignUpRequest request) =>

@@ -1,4 +1,7 @@
 using Administration.Extensions;
+using Application.Validators;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using NLog;
 using NLog.Web;
 using Microsoft.OpenApi.Models;
@@ -17,6 +20,9 @@ try
         .AddAuthentication(builder.Configuration)
         .RegisterServices(builder.Configuration);
     builder.Services.AddControllers();
+    builder.Services.AddValidatorsFromAssemblyContaining<SignUpRequestValidator>();
+    builder.Services.AddFluentValidationAutoValidation();
+
 
     builder.Services.AddEndpointsApiExplorer();
 

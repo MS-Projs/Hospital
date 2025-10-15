@@ -194,7 +194,7 @@ public class PatientService : IPatient
                 PatientId = request.PatientId,
                 FilePath = fileResult.Payload!,
                 FileType = request.FileType,
-                Category = request.CategoryId,
+                DocumentCategoryId = request.CategoryId,
                 EncryptedKey = _fileService.GenerateEncryptionKey(),
                 UploadedAt = DateTime.UtcNow,
                 CreatedDate = DateTime.UtcNow,
