@@ -49,7 +49,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -100,7 +100,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("character varying(100)")
                         .HasColumnName("first_name");
 
-                    b.Property<int?>("Gender")
+                    b.Property<int>("Gender")
                         .HasColumnType("integer")
                         .HasColumnName("gender");
 
@@ -126,11 +126,14 @@ namespace DataAccess.Migrations
                         .HasColumnType("character varying(500)")
                         .HasColumnName("profile_photo_path");
 
+                    b.Property<int>("Role")
+                        .HasColumnType("integer");
+
                     b.Property<byte>("Status")
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -192,7 +195,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -229,7 +232,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -295,7 +298,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -360,7 +363,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -399,7 +402,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -470,7 +473,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -530,7 +533,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 
@@ -595,7 +598,7 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
-                    b.Property<DateTime>("UpdatedDate")
+                    b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
 

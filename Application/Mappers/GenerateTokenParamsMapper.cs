@@ -20,7 +20,7 @@ public class GenerateTokenParamsMapper : IRegister
             source.FirstName,
             source.LastName,
             source.Phone,
-            "user",
+            source.Role.ToString(), 
             source.Email);
     }
 }

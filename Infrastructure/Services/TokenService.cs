@@ -31,7 +31,7 @@ internal class TokenService(
                 new(JwtRegisteredClaimNames.FamilyName, tokenParams.LastName),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.MobilePhone, tokenParams.Phone),
-                new(ClaimTypes.Role, tokenParams.Role??"user")
+                new(ClaimTypes.Role, tokenParams.Role)
             };
 
             var token = new JwtSecurityToken(jwtOptions.Value.Issuer, jwtOptions.Value.Audience, claims,

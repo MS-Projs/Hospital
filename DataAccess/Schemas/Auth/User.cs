@@ -48,6 +48,8 @@ public class User : Entity
     [MaxLength(500)]
     [Column("profile_photo_path")]
     public string? ProfilePhotoPath { get; set; }
+    
+    public Role Role { get; set; } = Role.Guest;
 
     // Navigation properties
     public Patient? Patient { get; set; }
