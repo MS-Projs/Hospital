@@ -43,7 +43,7 @@ internal class TokenService(
 
             return Task.FromResult<Result<GeneratedTokenResult>>(new GeneratedTokenResult(tokenString, expiry));
         }
-                                      catch (Exception ex)
+        catch (Exception ex)
         {
             logger.LogCritical(ex, "Error generating token for user {UserId}", tokenParams.Id);
             return Task.FromResult<Result<GeneratedTokenResult>>(new ErrorModel(ErrorEnum.InternalServerError));

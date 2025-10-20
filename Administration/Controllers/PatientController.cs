@@ -13,7 +13,6 @@ namespace Administration.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
-[Authorize]
 public class PatientController : MyController<PatientController>
 {
     private readonly IPatient _patientService;

@@ -39,7 +39,8 @@ public class User : Entity
     public DateTime? DateOfBirth { get; set; }
 
     [Column("gender")]
-    public Gender Gender { get; set; }
+    public Gender? Gender { get; set; }
+
 
     [MaxLength(500)]
     [Column("address")]
@@ -49,7 +50,7 @@ public class User : Entity
     [Column("profile_photo_path")]
     public string? ProfilePhotoPath { get; set; }
     
-    public Role Role { get; set; } = Role.Guest;
+    public Role Role { get; set; } = Role.User;
 
     // Navigation properties
     public Patient? Patient { get; set; }

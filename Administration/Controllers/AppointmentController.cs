@@ -3,68 +3,63 @@ using Application.Interfaces;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Administration.Controllers;
 
-/// <summary>
-/// Controller for doctor management operations
-/// </summary>
-[ApiController]
-[Route("api/v1/[controller]/[action]")]
-
-public class DoctorController : MyController<DoctorController>
+public class AppointmentController : MyController<AppointmentController>
 {
-    private readonly IDoctor _doctorService;
+    private readonly IAppointment _appointmentService;
+    private readonly IReport _reportService;
 
-    public DoctorController(IDoctor doctorService)
+    public AppointmentController(IAppointment appointmentService, IReport reportService)
     {
-        _doctorService = doctorService;
+        _appointmentService = appointmentService;
+        _reportService = reportService;
     }
 
     #region CRUD Operations
 
     /// <summary>
-    /// Create or update a doctor
+    /// Create or update a Appointment
     /// </summary>
-    /// <param name="request">Doctor information</param>
+    /// <param name="request">Appointment information</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Doctor view model</returns>
+    /// <returns>Appointment view model</returns>
     [HttpPost]
-    public async Task<Result<DoctorViewModel>> UpsertDoctor(
-        UpsertDoctorRequest request, 
+    public async Task<Result<AppointmentViewModel>> UpsertAppointment(
+        CreateAppointmentRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.UpsertDoctor(request, cancellationToken);
+        return await _appointmentService.CreateAppointment(request, cancellationToken);
     }
 
     /// <summary>
-    /// Get doctor by ID
+    /// Get Appointment by ID
     /// </summary>
-    /// <param name="doctorId">Doctor ID</param>
+    /// <param name="appointmentId">Appointment ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Doctor single view model</returns>
+    /// <returns>Appointment single view model</returns>
     [HttpGet]
-    public async Task<Result<DoctorSingleViewModel>> GetDoctorById(
-        [FromQuery] long doctorId, 
+    public async Task<Result<AppointmentViewModel>> GetAppointmentById(
+        [FromQuery] long appointmentId,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.GetDoctorById(doctorId, cancellationToken);
+        return await _appointmentService.GetAppointmentById(appointmentId, cancellationToken);
     }
 
     /// <summary>
-    /// Get paginated list of doctors with optional filtering
+    /// Get paginated list of Appointments with optional filtering
     /// </summary>
     /// <param name="request">Filter and pagination parameters</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Paginated list of doctors</returns>
+    /// <returns>Paginated list of Appointments</returns>
     [HttpPost]
-    public async Task<Result<PagedResult<DoctorViewModel>>> GetDoctors(
-        FilterDoctorRequest request, 
+    public async Task<Result<PagedResult<AppointmentViewModel>>> GetAppointments(
+        FilterAppointmentRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.GetDoctors(request, cancellationToken);
+        return await _appointmentService.GetAppointments(request, cancellationToken);
     }
 
     #endregion
@@ -72,22 +67,50 @@ public class DoctorController : MyController<DoctorController>
     #region Status Management
 
     /// <summary>
-    /// Toggle doctor activation status (activate/deactivate)
+    /// Toggle Appointment activation status (activate/deactivate)
     /// </summary>
-    /// <param name="doctorId">Doctor ID</param>
+    /// <param name="appointmentId">Appointment ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Updated doctor view model</returns>
+    /// <returns>Updated Appointment view model</returns>
     [HttpPost]
-    public async Task<Result<DoctorViewModel>> ToggleActivation(
-        [FromQuery] long doctorId, 
+    public async Task<Result<bool>> ToggleActivation(
+        [FromQuery] long appointmentId,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.DoctorToggleActivation(doctorId, cancellationToken);
+        return await _appointmentService.AppointmentToggleActivation(appointmentId, cancellationToken);
+    }
+
+    /// <summary>
+    /// Toggle Appointment status (pending / approved / completed)
+    /// </summary>
+    /// <param name="request"></param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Updated Appointment view model</returns>
+    [HttpPost]
+    public async Task<Result<AppointmentViewModel>> UpdateAppointmentStatus(
+        UpdateAppointmentStatusRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await _appointmentService.UpdateAppointmentStatus(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Toggle Appointment status (pending / approved / completed)
+    /// </summary>
+    /// <param name="appointmentId">Appointment ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Updated Appointment view model</returns>
+    [HttpPost]
+    public async Task<Result<bool>> CancelAppointment(
+        [FromQuery] long appointmentId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _appointmentService.CancelAppointment(appointmentId, cancellationToken);
     }
 
     #endregion
-
-    #region Doctor Certificate Management
+    
+    /*#region Doctor Certificate Management
 
     /// <summary>
     /// Upload a certificate for a doctor
@@ -151,5 +174,5 @@ public class DoctorController : MyController<DoctorController>
         return await _doctorService.DeleteDoctorCertificate(certificateId, cancellationToken);
     }
 
-    #endregion
+    #endregion*/
 }

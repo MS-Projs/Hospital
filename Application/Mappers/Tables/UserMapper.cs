@@ -1,4 +1,5 @@
-﻿using DataAccess.Schemas.Auth;
+﻿using DataAccess.Enums;
+using DataAccess.Schemas.Auth;
 using Domain.Models.API.Requests;
 using Mapster;
 
@@ -19,6 +20,7 @@ public class UserMapper : IRegister
             LastName = source.LastName,
             Phone = source.Phone,
             Password = source.Password,
+            Role = Role.User
         };
     }
 }

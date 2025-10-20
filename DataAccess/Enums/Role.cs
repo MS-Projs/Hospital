@@ -2,8 +2,7 @@ namespace DataAccess.Enums;
 
 public enum Role
 {
-    Guest,
+    User,
     Admin ,
     Doctor,
-    Patient,
 }

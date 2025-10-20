@@ -11,4 +11,6 @@ public interface IAppointment
     Task<Result<AppointmentViewModel>> GetAppointmentById(long appointmentId, CancellationToken cancellationToken);
     Task<Result<PagedResult<AppointmentViewModel>>> GetAppointments(FilterAppointmentRequest request, CancellationToken cancellationToken);
     Task<Result<bool>> CancelAppointment(long appointmentId, CancellationToken cancellationToken);
+    Task<Result<bool>> AppointmentToggleActivation(long appointmentId, CancellationToken cancellationToken);
+
 }

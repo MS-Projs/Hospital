@@ -182,4 +182,27 @@ public class AppointmentService(EntityContext context) : IAppointment
             return new ErrorModel(ErrorEnum.InternalServerError);
         }
     }
+    
+    public async Task<Result<bool>> AppointmentToggleActivation(long appointmentId, CancellationToken cancellationToken)
+    {
+        try
+        {
+            var appointment = await context.Appointments
+                .FirstOrDefaultAsync(a => a.Id == appointmentId && a.Status != EntityStatus.Deleted, cancellationToken);
+                
+            if (appointment == null)
+                return new ErrorModel(ErrorEnum.AppointmentNotFound);
+
+            appointment.Status = EntityStatus.Deleted;
+            appointment.UpdatedDate = DateTime.UtcNow;
+
+            await context.SaveChangesAsync(cancellationToken);
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
 }

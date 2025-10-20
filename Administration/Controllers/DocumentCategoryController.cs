@@ -13,7 +13,7 @@ namespace Administration.Controllers;
 /// </summary>
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
-[Authorize]
+
 public class DocumentCategoryController : MyController<DocumentCategoryController>
 {
     private readonly IDocumentCategory _documentCategoryService;
