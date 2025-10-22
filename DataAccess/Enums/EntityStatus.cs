@@ -3,6 +3,6 @@
 public enum EntityStatus : byte
 {
     Active,
-    Inactive,
-    Deleted
+    Deleted,
+    Inactive
 }

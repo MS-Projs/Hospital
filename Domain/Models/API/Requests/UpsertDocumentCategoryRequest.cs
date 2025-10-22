@@ -3,7 +3,7 @@ using Newtonsoft.Json;
 
 namespace Domain.Models.API.Requests;
 
-public class UpsertDocumentCategoryRequest : BasicViewModelLocalizedWithState
+public class UpsertDocumentCategoryRequest : LocalizedViewModel
 {
     [JsonProperty("id")]
     public int? Id { get; set; }

@@ -24,6 +24,7 @@ public static class ServiceExtension
             .AddScoped<IDoctor, DoctorService>()
             .AddScoped<ICertificateType, CertificateTypeService>()
             .AddScoped<IAppointment, AppointmentService>()
+            .AddScoped<IDocumentCategory, DocumentCategoryService>()
             .AddScoped<IReport, ReportService>();
         
         services.AddMapsterConfig();

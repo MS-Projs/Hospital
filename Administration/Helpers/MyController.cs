@@ -12,6 +12,6 @@ public class MyController<T> : ControllerBase
     {
         var userId = User.FindFirst(ClaimTypes.NameIdentifier)?.Value ??
                      User.FindFirst(JwtRegisteredClaimNames.Sub)?.Value;
-        return long.Parse(userId ?? string.Empty);
+        return long.Parse(userId ?? "0");
     }
 }

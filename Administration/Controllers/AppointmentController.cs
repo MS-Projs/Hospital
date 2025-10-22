@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Administration.Controllers;
 
+
+[ApiController]
+[Route("api/v1/[controller]/[action]")]
 public class AppointmentController : MyController<AppointmentController>
 {
     private readonly IAppointment _appointmentService;
@@ -110,48 +113,76 @@ public class AppointmentController : MyController<AppointmentController>
 
     #endregion
     
-    /*#region Doctor Certificate Management
+    #region Appointment Report Management
 
     /// <summary>
-    /// Upload a certificate for a doctor
+    /// Create a new medical report for a patient appointment
     /// </summary>
-    /// <param name="request">Certificate upload request containing doctor ID, file, and metadata</param>
+    /// <param name="request">Report creation request containing patient, doctor, and report details</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Uploaded certificate details</returns>
-    [HttpPost("upload-certificate")]
-    public async Task<Result<CertificateViewModel>> UploadCertificate(
-        [FromForm] UploadDoctorCertificateRequest request,
+    /// <returns>Created report details</returns>
+    [HttpPost]
+    public async Task<Result<ReportViewModel>> CreateReport(
+        [FromForm] CreateReportRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.UploadDoctorCertificate(request, cancellationToken);
+        return await _reportService.CreateReport(request, cancellationToken);
     }
 
     /// <summary>
-    /// Get all certificates for a specific doctor
+    /// Get a specific medical report by ID
     /// </summary>
-    /// <param name="doctorId">Doctor ID</param>
+    /// <param name="reportId">Report ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>List of doctor certificates</returns>
-    [HttpGet("certificates")]
-    public async Task<Result<List<CertificateViewModel>>> GetCertificates(
-        [FromQuery] long doctorId,
+    /// <returns>Report details</returns>
+    [HttpGet]
+    public async Task<Result<ReportViewModel>> GetReport(
+        [FromQuery] long reportId,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.GetDoctorCertificates(doctorId, cancellationToken);
+        return await _reportService.GetReportById(reportId, cancellationToken);
     }
 
     /// <summary>
-    /// Download a specific doctor certificate
+    /// Get filtered list of medical reports
     /// </summary>
-    /// <param name="certificateId">Certificate ID</param>
+    /// <param name="request">Filter parameters including patient ID, doctor ID, date range</param>
     /// <param name="cancellationToken">Cancellation token</param>
-    /// <returns>Certificate file stream</returns>
-    [HttpGet("download-certificate")]
-    public async Task<IActionResult> DownloadCertificate(
-        [FromQuery] long certificateId,
+    /// <returns>Paged list of medical reports</returns>
+    [HttpGet]
+    public async Task<Result<PagedResult<ReportViewModel>>> GetReports(
+        [FromQuery] FilterReportRequest request,
         CancellationToken cancellationToken = default)
     {
-        var result = await _doctorService.DownloadDoctorCertificate(certificateId, cancellationToken);
+        return await _reportService.GetReports(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Upload or update a PDF file for an existing report
+    /// </summary>
+    /// <param name="request">Report file upload request containing report ID and file</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Updated report details</returns>
+    [HttpPost]
+    public async Task<Result<ReportViewModel>> UploadReportFile(
+        [FromForm] UploadReportFileRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await _reportService.UploadReportFile(request, cancellationToken);
+    }
+
+    /// <summary>
+    /// Download a medical report PDF file
+    /// </summary>
+    /// <param name="reportId">Report ID</param>
+    /// <param name="cancellationToken">Cancellation token</param>
+    /// <returns>Report PDF file stream</returns>
+    [HttpGet]
+    public async Task<IActionResult> DownloadReport(
+        [FromQuery] long reportId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = await _reportService.DownloadReportPdf(reportId, cancellationToken);
 
         if (!result.Success)
             return BadRequest(result.Error);
@@ -161,18 +192,18 @@ public class AppointmentController : MyController<AppointmentController>
     }
 
     /// <summary>
-    /// Delete a doctor certificate (soft delete)
+    /// Delete a medical report (soft delete)
     /// </summary>
-    /// <param name="certificateId">Certificate ID</param>
+    /// <param name="reportId">Report ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("certificate")]
-    public async Task<Result<bool>> DeleteCertificate(
-        [FromQuery] long certificateId,
+    [HttpDelete]
+    public async Task<Result<bool>> DeleteReport(
+        [FromQuery] long reportId,
         CancellationToken cancellationToken = default)
     {
-        return await _doctorService.DeleteDoctorCertificate(certificateId, cancellationToken);
+        return await _reportService.DeleteReport(reportId, cancellationToken);
     }
 
-    #endregion*/
+    #endregion 
 }

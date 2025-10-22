@@ -17,6 +17,4 @@ public class UploadPatientDocumentRequest
 
     public long? CategoryId { get; set; }
 
-    [MaxLength(500)]
-    public string? Description { get; set; }
 }
