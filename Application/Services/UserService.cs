@@ -8,11 +8,13 @@ using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
 using Domain.Models.Infrastructure.Params;
+using Domain.Models.Integration.Sms;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -20,30 +22,46 @@ public class UserService(
     ITokenService tokenService,
     EntityContext context,
     IHttpContextAccessor httpContextAccessor,
-    IFileService fileService) : IUserService
+    IFileService fileService,
+    ISmsService smsService,
+    ILogger<UserService> logger) : IUserService
 {
-    public async Task<Result<SignUpResult>> SignUp(SignUpRequest signUpRequest)
+  
+    public async Task<Result<CreateSessionResult>> CreateSession(CreateSessionRequest createSessionRequest)
     {
-        var isPhoneNotUnique = await context.Users.AnyAsync(x => x.Phone == signUpRequest.Phone);
-        if (isPhoneNotUnique)
-            return new ErrorModel(ErrorEnum.PhoneAlreadyExists);
-
-        var newUser = signUpRequest.Adapt<User>();
-        newUser.Password = newUser.Password.HashPassword();
-        await context.Users.AddAsync(newUser);
+        var cleanedPhone= createSessionRequest.Phone.TrimStart('+', '0');
+        var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Phone == cleanedPhone);
+            
+        User user;
+        if (existingUser == null)
+        {
+            user = createSessionRequest.Adapt<User>();
+            user.Phone = cleanedPhone;
+                
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+        }
+        else
+            user = existingUser;
+            
+        var newSession = user.Adapt<Session>();
+            
+        await context.Sessions.AddAsync(newSession);
         await context.SaveChangesAsync();
+            
+        await smsService.SendSms((user, newSession).Adapt<SendSmsParams>());
 
-        return await GenerateTokenForUser(newUser);
+        return newSession.Adapt<CreateSessionResult>();
     }
 
-    public async Task<Result<SignInResult>> SignIn(SignInRequest request)
+    public Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
     {
-        var user = await context.Users.FirstOrDefaultAsync(x => x.Phone == request.Phone);
-        if (user == null || !request.Password.VerifyPassword(user.Password))
-            return new ErrorModel(ErrorEnum.UserNotFound);
-        
-        var token = await GenerateTokenForUser(user);
-        return token.Adapt<SignInResult>();
+        throw new NotImplementedException();
+    }
+
+    public Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
+    {
+        throw new NotImplementedException();
     }
 
     #region Profile Management
@@ -261,4 +279,6 @@ public class UserService(
         var token = await tokenService.GenerateToken(user.Adapt<GenerateTokenParams>());
         return token.Payload.Adapt<SignUpResult>();
     }
+    
+   
 }

@@ -6,8 +6,9 @@ namespace Application.Interfaces;
 
 public interface IUserService
 {
-    Task<Result<SignUpResult>> SignUp(SignUpRequest signUpRequest);
-    Task<Result<SignInResult>> SignIn(SignInRequest request);
+    Task<Result<CreateSessionResult>> CreateSession(CreateSessionRequest createSessionRequest);
+    Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request);
+    Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request);
 
     // Profile Management
     Task<Result<UserProfileViewModel>> GetProfile(long userId, CancellationToken cancellationToken);

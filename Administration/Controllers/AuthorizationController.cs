@@ -13,23 +13,37 @@ namespace Administration.Controllers;
 [Route("api/v1/[controller]/[action]")]
 public class AuthorizationController: MyController<AuthorizationController>
 {
-    private readonly IValidator<SignUpRequest> _validator;
     private readonly IUserService _userService;
-    public AuthorizationController(IUserService userService,
-        IValidator<SignUpRequest> validator)
+    public AuthorizationController(IUserService userService)
     {
         _userService = userService;
-        _validator = validator;
     }
-    [HttpPost]
-    public async Task<Result<SignUpResult>>
-        SignUp(SignUpRequest request) =>
-        await _userService.SignUp(request);
+    /// <summary>
+    /// send otp to phone number
+    /// </summary>
+    /// <param name="request">phoneNumber should send as 998... format </param>
+    /// <returns></returns>
+    [HttpPost("send-otp")]
+    public async Task<Result<CreateSessionResult>> CreateSession(CreateSessionRequest request)
+        => await _userService.CreateSession(request);
 
-    [HttpPost]
-    public async Task<Result<SignInResult>> 
-        SignIn(SignInRequest request) =>
-        await _userService.SignIn(request);
+    /// <summary>
+    /// verify otp
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("verify-otp")]
+    public async Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
+        => await _userService.VerifySession(request);
+
+    /// <summary>
+    /// Refresh token
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns></returns>
+    [HttpPost("refresh-token")]
+    public async Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
+        => await _userService.RefreshToken(request);
     
     #region Profile Management
 

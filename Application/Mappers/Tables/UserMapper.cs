@@ -9,17 +9,15 @@ public class UserMapper : IRegister
 {
     public void Register(TypeAdapterConfig config)
     {
-        config.NewConfig<SignUpRequest, User>().ConstructUsing(src => Map(src));
+        config.NewConfig<CreateSessionRequest, User>().ConstructUsing(src => Map(src));
     }
 
-    private static User Map(SignUpRequest source)
+    private static User Map(CreateSessionRequest source)
     {
         return new User
         {
-            FirstName = source.FirstName,
-            LastName = source.LastName,
+           
             Phone = source.Phone,
-            Password = source.Password,
             Role = Role.User
         };
     }
