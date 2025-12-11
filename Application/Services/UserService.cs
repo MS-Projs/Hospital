@@ -54,14 +54,86 @@ public class UserService(
         return newSession.Adapt<CreateSessionResult>();
     }
 
-    public Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
+    public async Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var session = await context.Sessions
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(x => x.Id == request.SessionId);
+            
+            if (session is null || session.OtpExpireDate < DateTime.UtcNow || session.IsVerified)
+                return new ErrorModel(ErrorEnum.SessionNotFound);
+            
+            if (session.OtpCode != request.Code)
+                return new ErrorModel(ErrorEnum.InvalidCode);
+        
+            var tokenResult = await tokenService.GenerateToken(session.User.Adapt<GenerateTokenParams>());
+        
+            if (!tokenResult.Success)
+                return tokenResult.Error!;
+
+            // Store refresh token in database
+            var refreshToken = new RefreshToken
+            {
+                UserId = session.User.Id,
+                Token = tokenResult.Payload.RefreshToken,
+                ExpiresAt = tokenResult.Payload.RefreshTokenExpiry,
+            };
+
+            await context.RefreshTokens.AddAsync(refreshToken);
+            context.Sessions.Remove(session);
+            await context.SaveChangesAsync();
+        
+            return tokenResult.Payload.Adapt<VerifySessionResult>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error verifying session {SessionId}", request.SessionId);
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
     }
 
-    public Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
+    public async Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
     {
-        throw new NotImplementedException();
+        try
+        {
+            var refreshToken = await context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
+
+            if (refreshToken is null)
+                return new ErrorModel(ErrorEnum.InvalidRefreshToken);
+
+            if (refreshToken.ExpiresAt < DateTime.UtcNow)
+                return new ErrorModel(ErrorEnum.RefreshTokenExpired);
+
+            // Generate new tokens
+            var tokenResult = await tokenService.GenerateToken(refreshToken.User.Adapt<GenerateTokenParams>());
+            
+            if (!tokenResult.Success)
+                return tokenResult.Error!;
+
+            context.Remove(refreshToken);
+
+            // Store new refresh token
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = refreshToken.UserId,
+                Token = tokenResult.Payload!.RefreshToken,
+                ExpiresAt = tokenResult.Payload.RefreshTokenExpiry,
+            };
+
+            await context.RefreshTokens.AddAsync(newRefreshToken);
+            await context.SaveChangesAsync();
+
+            return tokenResult.Payload.Adapt<RefreshTokenResult>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error refreshing token");
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
     }
 
     #region Profile Management

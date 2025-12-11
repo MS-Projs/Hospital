@@ -4,6 +4,7 @@ using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
 using FluentValidation;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using SignInResult = Domain.Models.API.Results.SignInResult;
 
@@ -53,7 +54,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User profile details</returns>
-    [HttpGet("profile")]
+    [HttpGet("profile"),Authorize]
     public async Task<Result<UserProfileViewModel>> GetProfile(
         [FromQuery] long userId,
         CancellationToken cancellationToken = default)
@@ -67,7 +68,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Profile update request with new user details</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user profile</returns>
-    [HttpPut("profile")]
+    [HttpPut("profile"),Authorize]
     public async Task<Result<UserProfileViewModel>> UpdateProfile(
         [FromBody] UpdateProfileRequest request,
         CancellationToken cancellationToken = default)
@@ -81,7 +82,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Profile photo upload request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user profile with new photo URL</returns>
-    [HttpPost("profile-photo")]
+    [HttpPost("profile-photo"),Authorize]
     public async Task<Result<UserProfileViewModel>> UploadProfilePhoto(
         [FromForm] UploadProfilePhotoRequest request,
         CancellationToken cancellationToken = default)
@@ -95,7 +96,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("profile-photo")]
+    [HttpDelete("profile-photo"),Authorize]
     public async Task<Result<bool>> DeleteProfilePhoto(
         [FromQuery] long userId,
         CancellationToken cancellationToken = default)

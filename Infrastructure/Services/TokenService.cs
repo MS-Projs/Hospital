@@ -1,5 +1,6 @@
 ﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
 using Domain.Enums;
 using Domain.Models.Common;
@@ -21,32 +22,46 @@ internal class TokenService(
     {
         try
         {
+            // Generate Access Token
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Value.Key));
             var credentials = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
             var claims = new List<Claim>
             {
                 new(JwtRegisteredClaimNames.Sub, tokenParams.Id.ToString()),
-                new(JwtRegisteredClaimNames.GivenName, tokenParams.FirstName),
-                new(JwtRegisteredClaimNames.FamilyName, tokenParams.LastName),
                 new(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
                 new(ClaimTypes.MobilePhone, tokenParams.Phone),
                 new(ClaimTypes.Role, tokenParams.Role)
             };
 
-            var token = new JwtSecurityToken(jwtOptions.Value.Issuer, jwtOptions.Value.Audience, claims,
-                expires: DateTime.UtcNow.AddMinutes(jwtOptions.Value.ExpirationInMinutes),
+            var accessTokenExpiry = DateTime.UtcNow.AddMinutes(jwtOptions.Value.ExpirationInMinutes);
+            var token = new JwtSecurityToken(
+                jwtOptions.Value.Issuer, 
+                jwtOptions.Value.Audience, 
+                claims,
+                expires: accessTokenExpiry,
                 signingCredentials: credentials);
 
-            var tokenString = new JwtSecurityTokenHandler().WriteToken(token);
-            var expiry = token.ValidTo;
+            var accessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            return Task.FromResult<Result<GeneratedTokenResult>>(new GeneratedTokenResult(tokenString, expiry));
+            // Generate Refresh Token
+            var refreshToken = GenerateRefreshToken();
+            var refreshTokenExpiry = DateTime.UtcNow.AddDays(jwtOptions.Value.RefreshTokenExpirationInDays);
+
+            return Task.FromResult<Result<GeneratedTokenResult>>(
+                new GeneratedTokenResult(accessToken, accessTokenExpiry, refreshToken, refreshTokenExpiry));
         }
         catch (Exception ex)
         {
             logger.LogCritical(ex, "Error generating token for user {UserId}", tokenParams.Id);
             return Task.FromResult<Result<GeneratedTokenResult>>(new ErrorModel(ErrorEnum.InternalServerError));
         }
+    }
+    private static string GenerateRefreshToken()
+    {
+        var randomNumber = new byte[64];
+        using var rng = RandomNumberGenerator.Create();
+        rng.GetBytes(randomNumber);
+        return Convert.ToBase64String(randomNumber);
     }
 }
