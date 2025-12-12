@@ -8,14 +8,12 @@ using Microsoft.EntityFrameworkCore;
 namespace DataAccess.Schemas.Auth;
 
 [Table("users", Schema = "auth")]
-[Index(nameof(Email), IsUnique = true)]
-[Index(nameof(Phone), IsUnique = true)]
 public class User : Entity
 {
-    [Required]
+
     [MaxLength(100)]
     [Column("first_name")]
-    public string FirstName { get; set; } = null!;
+    public string? FirstName { get; set; } 
 
     [MaxLength(100)]
     [Column("last_name")]
@@ -25,10 +23,10 @@ public class User : Entity
     [Column("email")]
     public string? Email { get; set; }
 
-    [Required]
+
     [MaxLength(500)]
     [Column("password")]
-    public string Password { get; set; } = default!;
+    public string? Password { get; set; } = default!;
 
     [Required]
     [MaxLength(32)]

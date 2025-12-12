@@ -8,6 +8,8 @@ public partial class EntityContext
 {
     public virtual DbSet<User> Users { get; set; }
     public virtual DbSet<Session> Sessions { get; set; }
+    public virtual DbSet<RefreshToken> RefreshTokens { get; set; }
+    
     public virtual DbSet<Patient> Patients { get; set; }
     public virtual DbSet<Doctor> Doctors { get; set; }
     public virtual DbSet<DoctorCertificate> DoctorCertificates { get; set; }

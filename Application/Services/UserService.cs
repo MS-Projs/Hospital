@@ -8,11 +8,13 @@ using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
 using Domain.Models.Infrastructure.Params;
+using Domain.Models.Integration.Sms;
 using Infrastructure.Extensions;
 using Infrastructure.Interfaces;
 using Mapster;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
 namespace Application.Services;
 
@@ -20,30 +22,118 @@ public class UserService(
     ITokenService tokenService,
     EntityContext context,
     IHttpContextAccessor httpContextAccessor,
-    IFileService fileService) : IUserService
+    IFileService fileService,
+    ISmsService smsService,
+    ILogger<UserService> logger) : IUserService
 {
-    public async Task<Result<SignUpResult>> SignUp(SignUpRequest signUpRequest)
+  
+    public async Task<Result<CreateSessionResult>> CreateSession(CreateSessionRequest createSessionRequest)
     {
-        var isPhoneNotUnique = await context.Users.AnyAsync(x => x.Phone == signUpRequest.Phone);
-        if (isPhoneNotUnique)
-            return new ErrorModel(ErrorEnum.PhoneAlreadyExists);
-
-        var newUser = signUpRequest.Adapt<User>();
-        newUser.Password = newUser.Password.HashPassword();
-        await context.Users.AddAsync(newUser);
+        var cleanedPhone= createSessionRequest.Phone.TrimStart('+', '0');
+        var existingUser = await context.Users.FirstOrDefaultAsync(x => x.Phone == cleanedPhone);
+            
+        User user;
+        if (existingUser == null)
+        {
+            user = createSessionRequest.Adapt<User>();
+            user.Phone = cleanedPhone;
+                
+            await context.Users.AddAsync(user);
+            await context.SaveChangesAsync();
+        }
+        else
+            user = existingUser;
+            
+        var newSession = user.Adapt<Session>();
+            
+        await context.Sessions.AddAsync(newSession);
         await context.SaveChangesAsync();
+            
+        //await smsService.SendSms((user, newSession).Adapt<SendSmsParams>());
 
-        return await GenerateTokenForUser(newUser);
+        return newSession.Adapt<CreateSessionResult>();
     }
 
-    public async Task<Result<SignInResult>> SignIn(SignInRequest request)
+    public async Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
     {
-        var user = await context.Users.FirstOrDefaultAsync(x => x.Phone == request.Phone);
-        if (user == null || !request.Password.VerifyPassword(user.Password))
-            return new ErrorModel(ErrorEnum.UserNotFound);
+        try
+        {
+            var session = await context.Sessions
+                .Include(s => s.User)
+                .FirstOrDefaultAsync(x => x.Id == request.SessionId);
+            
+            if (session is null || session.OtpExpireDate < DateTime.UtcNow || session.IsVerified)
+                return new ErrorModel(ErrorEnum.SessionNotFound);
+            
+            if (session.OtpCode != request.Code)
+                return new ErrorModel(ErrorEnum.InvalidCode);
         
-        var token = await GenerateTokenForUser(user);
-        return token.Adapt<SignInResult>();
+            var tokenResult = await tokenService.GenerateToken(session.User.Adapt<GenerateTokenParams>());
+        
+            if (!tokenResult.Success)
+                return tokenResult.Error!;
+
+            // Store refresh token in database
+            var refreshToken = new RefreshToken
+            {
+                UserId = session.User.Id,
+                Token = tokenResult.Payload.RefreshToken,
+                ExpiresAt = tokenResult.Payload.RefreshTokenExpiry,
+            };
+
+            await context.RefreshTokens.AddAsync(refreshToken);
+            context.Sessions.Remove(session);
+            await context.SaveChangesAsync();
+        
+            return tokenResult.Payload.Adapt<VerifySessionResult>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error verifying session {SessionId}", request.SessionId);
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    public async Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
+    {
+        try
+        {
+            var refreshToken = await context.RefreshTokens
+                .Include(rt => rt.User)
+                .FirstOrDefaultAsync(rt => rt.Token == request.RefreshToken);
+
+            if (refreshToken is null)
+                return new ErrorModel(ErrorEnum.InvalidRefreshToken);
+
+            if (refreshToken.ExpiresAt < DateTime.UtcNow)
+                return new ErrorModel(ErrorEnum.RefreshTokenExpired);
+
+            // Generate new tokens
+            var tokenResult = await tokenService.GenerateToken(refreshToken.User.Adapt<GenerateTokenParams>());
+            
+            if (!tokenResult.Success)
+                return tokenResult.Error!;
+
+            context.Remove(refreshToken);
+
+            // Store new refresh token
+            var newRefreshToken = new RefreshToken
+            {
+                UserId = refreshToken.UserId,
+                Token = tokenResult.Payload!.RefreshToken,
+                ExpiresAt = tokenResult.Payload.RefreshTokenExpiry,
+            };
+
+            await context.RefreshTokens.AddAsync(newRefreshToken);
+            await context.SaveChangesAsync();
+
+            return tokenResult.Payload.Adapt<RefreshTokenResult>();
+        }
+        catch (Exception ex)
+        {
+            logger.LogError(ex, "Error refreshing token");
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
     }
 
     #region Profile Management
@@ -261,4 +351,6 @@ public class UserService(
         var token = await tokenService.GenerateToken(user.Adapt<GenerateTokenParams>());
         return token.Payload.Adapt<SignUpResult>();
     }
+    
+   
 }

@@ -7,6 +7,7 @@ namespace Domain.Models.API.Requests;
 public class UpdateProfileRequest
 {
     [JsonProperty("user_id")]
+    [JsonIgnore]
     public long UserId { get; set; }
 
     [MaxLength(100)]

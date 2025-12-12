@@ -23,5 +23,9 @@ public enum ErrorEnum
     ProfilePhotoNotFound,
     InvalidCurrentPassword,
     ValidationError,
-    InvalidInputParams
+    InvalidInputParams,
+    SessionNotFound,
+    InvalidCode,
+    InvalidRefreshToken,
+    RefreshTokenExpired
 }

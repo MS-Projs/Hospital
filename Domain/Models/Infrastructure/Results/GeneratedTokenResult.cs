@@ -1,5 +1,7 @@
 ﻿namespace Domain.Models.Infrastructure.Results;
 
 public record GeneratedTokenResult(
-    string Token,
-    DateTime ExpireDate);
+    string AccessToken, 
+    DateTime AccessTokenExpiry,
+    string RefreshToken,
+    DateTime RefreshTokenExpiry);
