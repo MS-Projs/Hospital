@@ -6,6 +6,7 @@ namespace Domain.Models.API.Requests;
 
 public class UploadProfilePhotoRequest
 {
+    [JsonIgnore]
     [Required]
     [JsonProperty("user_id")]
     public long UserId { get; set; }

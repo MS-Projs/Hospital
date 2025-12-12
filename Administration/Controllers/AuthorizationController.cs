@@ -56,10 +56,9 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <returns>User profile details</returns>
     [HttpGet("profile"),Authorize]
     public async Task<Result<UserProfileViewModel>> GetProfile(
-        [FromQuery] long userId,
         CancellationToken cancellationToken = default)
     {
-        return await _userService.GetProfile(userId, cancellationToken);
+        return await _userService.GetProfile(UserId, cancellationToken);
     }
 
     /// <summary>
@@ -73,7 +72,9 @@ public class AuthorizationController: MyController<AuthorizationController>
         [FromBody] UpdateProfileRequest request,
         CancellationToken cancellationToken = default)
     {
-        return await _userService.UpdateProfile(request, cancellationToken);
+        var newRequest = request;
+        newRequest.UserId = UserId;
+        return await _userService.UpdateProfile(newRequest, cancellationToken);
     }
 
     /// <summary>
@@ -87,6 +88,8 @@ public class AuthorizationController: MyController<AuthorizationController>
         [FromForm] UploadProfilePhotoRequest request,
         CancellationToken cancellationToken = default)
     {
+        var newRequest = request;
+        newRequest.UserId = UserId;
         return await _userService.UploadProfilePhoto(request, cancellationToken);
     }
 
@@ -98,10 +101,9 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <returns>Success status</returns>
     [HttpDelete("profile-photo"),Authorize]
     public async Task<Result<bool>> DeleteProfilePhoto(
-        [FromQuery] long userId,
         CancellationToken cancellationToken = default)
     {
-        return await _userService.DeleteProfilePhoto(userId, cancellationToken);
+        return await _userService.DeleteProfilePhoto(UserId,cancellationToken);
     }
 
     /// <summary>
@@ -126,10 +128,9 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <returns>Success status</returns>
     [HttpPost("deactivate"),Authorize]
     public async Task<Result<bool>> DeactivateAccount(
-        [FromQuery] long userId,
         CancellationToken cancellationToken = default)
     {
-        return await _userService.DeactivateAccount(userId, cancellationToken);
+        return await _userService.DeactivateAccount(UserId, cancellationToken);
     }
 
     /// <summary>
@@ -140,10 +141,9 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <returns>Success status</returns>
     [HttpDelete("account"),Authorize]
     public async Task<Result<bool>> DeleteAccount(
-        [FromQuery] long userId,
         CancellationToken cancellationToken = default)
     {
-        return await _userService.DeleteAccount(userId, cancellationToken);
+        return await _userService.DeleteAccount(UserId, cancellationToken);
     }
 
     #endregion
