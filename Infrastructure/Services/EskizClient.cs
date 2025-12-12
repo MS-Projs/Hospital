@@ -4,14 +4,23 @@ using Microsoft.Extensions.Logging;
 
 namespace Infrastructure.Services;
 
-public class EskizClient(HttpClient httpClient, ILogger<EskizClient> logger) : IEskizClient
+public class EskizClient : IEskizClient
 {
+    private readonly HttpClient _httpClient;
+    private readonly ILogger<EskizClient> _logger;
+
+    public EskizClient(ILogger<EskizClient> logger, HttpClient httpClient)
+    {
+        _logger = logger;
+        _httpClient = httpClient;
+    }
+
     public async Task<TResponse?> PostAsync<TResponse>(string url, Dictionary<string, string>? headers = null,
         Dictionary<string, string>? forms = null, CancellationToken cancellationToken = default)
     {
         using var httpRequest = new HttpRequestMessage(HttpMethod.Post, url);
         AddHeaders(httpRequest, headers, forms);
-        var response = await httpClient.SendAsync(httpRequest, cancellationToken);
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         return await DeserializeResponse<TResponse>(response);
     }
 
@@ -36,7 +45,7 @@ public class EskizClient(HttpClient httpClient, ILogger<EskizClient> logger) : I
 
         httpRequest.Content = multipartContent;
 
-        var response = await httpClient.SendAsync(httpRequest, cancellationToken);
+        var response = await _httpClient.SendAsync(httpRequest, cancellationToken);
         return await DeserializeResponse<TResponse>(response);
     }
 
@@ -68,7 +77,7 @@ public class EskizClient(HttpClient httpClient, ILogger<EskizClient> logger) : I
         if (!response.IsSuccessStatusCode)
         {
             var errorContent = await response.Content.ReadAsStringAsync();
-            logger.LogWarning("HTTP request failed with status {StatusCode}: {ErrorContent}", response.StatusCode,
+            _logger.LogWarning("HTTP request failed with status {StatusCode}: {ErrorContent}", response.StatusCode,
                 errorContent);
             throw new HttpRequestException($"HTTP request failed with status {response.StatusCode}: {errorContent}");
         }
@@ -86,7 +95,7 @@ public class EskizClient(HttpClient httpClient, ILogger<EskizClient> logger) : I
         }
         catch (JsonException ex)
         {
-            logger.LogError(ex, "Failed to deserialize response to type {Type}", typeof(TResponse).Name);
+            _logger.LogError(ex, "Failed to deserialize response to type {Type}", typeof(TResponse).Name);
             return default;
         }
     }

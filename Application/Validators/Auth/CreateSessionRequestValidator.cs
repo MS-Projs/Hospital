@@ -9,6 +9,6 @@ public class CreateSessionRequestValidator : AbstractValidator<CreateSessionRequ
     {
         RuleFor(x => x.Phone)
             .NotEmpty().WithMessage("Phone number is required")
-            .Matches(@"^(\+?998)(33|90|91|94|95|97|99|88|71|73|78)\d{7}$").WithMessage("Invalid phone number format");
+            .Matches(@"^(\+?998)\d{9}$") .WithMessage("Invalid phone number format");
     }
 }

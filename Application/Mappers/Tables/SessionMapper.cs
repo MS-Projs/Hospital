@@ -27,6 +27,6 @@ public class SessionMapper : IRegister
     {
         
         var random = new Random();
-        return random.Next(1002, 9999).ToString();
+        return "0123123"; //random.Next(1002, 9999).ToString();
     }
 }

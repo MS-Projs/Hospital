@@ -49,7 +49,7 @@ public class UserService(
         await context.Sessions.AddAsync(newSession);
         await context.SaveChangesAsync();
             
-        await smsService.SendSms((user, newSession).Adapt<SendSmsParams>());
+        //await smsService.SendSms((user, newSession).Adapt<SendSmsParams>());
 
         return newSession.Adapt<CreateSessionResult>();
     }

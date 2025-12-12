@@ -110,7 +110,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Password change request with old and new passwords</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpPost("change-password")]
+    [HttpPost("change-password"),Authorize]
     public async Task<Result<bool>> ChangePassword(
         [FromBody] ChangePasswordRequest request,
         CancellationToken cancellationToken = default)
@@ -124,7 +124,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpPost("deactivate")]
+    [HttpPost("deactivate"),Authorize]
     public async Task<Result<bool>> DeactivateAccount(
         [FromQuery] long userId,
         CancellationToken cancellationToken = default)
@@ -138,7 +138,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("account")]
+    [HttpDelete("account"),Authorize]
     public async Task<Result<bool>> DeleteAccount(
         [FromQuery] long userId,
         CancellationToken cancellationToken = default)

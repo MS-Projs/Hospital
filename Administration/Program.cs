@@ -1,9 +1,11 @@
 using Administration.Extensions;
 using Application.Validators;
 using Application.Validators.Auth;
+using DataAccess;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.OpenApi.Models;
 using NLog;
 using NLog.Web;
@@ -75,7 +77,8 @@ try
     });
 
     var app = builder.Build();
-
+    
+    
     // Swagger barcha muhitlarda ishlashi uchun
     app.UseSwagger();
     app.UseSwaggerUI(options =>
@@ -88,6 +91,7 @@ try
     app.UseAuthentication();
     app.UseAuthorization();
     app.MapControllers();
+    MigrateDatabase(app);
     app.Run();
 }
 catch (Exception ex)
@@ -98,4 +102,26 @@ catch (Exception ex)
 finally
 {
     LogManager.Shutdown();
+}
+
+void MigrateDatabase(WebApplication app)
+{
+    using var scope = app.Services.CreateScope();
+    var services = scope.ServiceProvider;
+    var logger = services.GetRequiredService<ILogger<Program>>();
+    
+    try
+    {
+        var context = services.GetRequiredService<EntityContext>();
+
+        // ✅ Faqat Migrate() ishlatilsin
+        context.Database.Migrate();
+
+        logger.LogInformation("Database migration completed successfully!");
+    }
+    catch (Exception ex)
+    {
+        logger.LogError(ex, "An error occurred during migration");
+        throw; // Re-throw to stop application startup
+    }
 }
