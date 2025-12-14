@@ -1,0 +1,95 @@
+name: Build & Deploy Doctor APP
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: 8.0.x
+
+    - name: Restore dependencies
+      run: dotnet restore
+
+    - name: Publish for Linux x64
+      run: dotnet publish API/API.csproj -c Release -r linux-x64 --self-contained false -o out/
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: build
+        path: out/
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Download published artifact
+      uses: actions/download-artifact@v4
+      with:
+        name: build
+
+    - name: Notify START
+      run: |
+        TEXT="🚀 Deployment of Doctor-app started on server.Branch: $GITHUB_REF_NAME"
+        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+        -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+        -d text="$TEXT"
+
+    - name: Copy files to server
+      uses: appleboy/scp-action@v0.1.7
+      with:
+        host: ${{ secrets.SERVER_HOST }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        source: "./*"
+        target: "/var/www/doctorapp/back/tmp-deploy"
+
+    - name: SSH deploy
+      uses: appleboy/ssh-action@v1.2.0
+      with:
+        host: ${{ secrets.SERVER_IP }}
+        username: ${{ secrets.SERVER_USER }}
+        key: ${{ secrets.SSH_PRIVATE_KEY }}
+        script: |
+          cd /var/www/doctorapp/back
+
+          echo "Creating backup (safe)..."
+          mkdir -p backup
+          cp -r *.dll backup/ || true
+
+          echo "Deploying new files..."
+          cp -r tmp-deploy/* .
+
+          echo "Cleaning temp..."
+          rm -rf tmp-deploy
+
+          echo "Restarting service..."
+          sudo systemctl restart avione-back.service
+
+    - name: Notify SUCCESS
+      if: success()
+      run: |
+        TEXT="✅ Deployment doctor app SUCCESSFUL 🎉\nService restarted: avione-back"
+        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+        -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+        -d text="$TEXT"
+
+    - name: Notify FAILURE
+      if: failure()
+      run: |
+        TEXT="❌ Deployment doctor app FAILED ❗"
+        curl -s -X POST https://api.telegram.org/bot${{ secrets.TELEGRAM_BOT_TOKEN }}/sendMessage \
+        -d chat_id=${{ secrets.TELEGRAM_CHAT_ID }} \
+        -d text="$TEXT"
