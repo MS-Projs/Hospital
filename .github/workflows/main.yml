@@ -76,7 +76,7 @@ jobs:
           rm -rf tmp-deploy
 
           echo "Restarting service..."
-          sudo systemctl restart avione-back.service
+          sudo systemctl restart api.service
 
     - name: Notify SUCCESS
       if: success()
