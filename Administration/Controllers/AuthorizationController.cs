@@ -3,10 +3,8 @@ using Application.Interfaces;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
-using FluentValidation;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using SignInResult = Domain.Models.API.Results.SignInResult;
 
 namespace Administration.Controllers;
 
@@ -24,7 +22,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// </summary>
     /// <param name="request">phoneNumber should send as 998... format </param>
     /// <returns></returns>
-    [HttpPost("send-otp")]
+    [HttpPost]
     public async Task<Result<CreateSessionResult>> CreateSession(CreateSessionRequest request)
         => await _userService.CreateSession(request);
 
@@ -33,7 +31,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("verify-otp")]
+    [HttpPost]
     public async Task<Result<VerifySessionResult>> VerifySession(VerifySessionRequest request)
         => await _userService.VerifySession(request);
 
@@ -42,7 +40,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// </summary>
     /// <param name="request"></param>
     /// <returns></returns>
-    [HttpPost("refresh-token")]
+    [HttpPost]
     public async Task<Result<RefreshTokenResult>> RefreshToken(RefreshTokenRequest request)
         => await _userService.RefreshToken(request);
     
@@ -54,7 +52,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>User profile details</returns>
-    [HttpGet("profile"),Authorize]
+    [HttpGet,Authorize]
     public async Task<Result<UserProfileViewModel>> GetProfile(
         CancellationToken cancellationToken = default)
     {
@@ -67,7 +65,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Profile update request with new user details</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user profile</returns>
-    [HttpPut("profile"),Authorize]
+    [HttpPut,Authorize]
     public async Task<Result<UserProfileViewModel>> UpdateProfile(
         [FromBody] UpdateProfileRequest request,
         CancellationToken cancellationToken = default)
@@ -83,7 +81,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Profile photo upload request</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated user profile with new photo URL</returns>
-    [HttpPost("profile-photo"),Authorize]
+    [HttpPost,Authorize]
     public async Task<Result<UserProfileViewModel>> UploadProfilePhoto(
         [FromForm] UploadProfilePhotoRequest request,
         CancellationToken cancellationToken = default)
@@ -99,7 +97,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("profile-photo"),Authorize]
+    [HttpDelete,Authorize]
     public async Task<Result<bool>> DeleteProfilePhoto(
         CancellationToken cancellationToken = default)
     {
@@ -112,7 +110,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="request">Password change request with old and new passwords</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpPost("change-password"),Authorize]
+    [HttpPost,Authorize]
     public async Task<Result<bool>> ChangePassword(
         [FromBody] ChangePasswordRequest request,
         CancellationToken cancellationToken = default)
@@ -126,7 +124,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpPost("deactivate"),Authorize]
+    [HttpPost,Authorize]
     public async Task<Result<bool>> DeactivateAccount(
         CancellationToken cancellationToken = default)
     {
@@ -139,7 +137,7 @@ public class AuthorizationController: MyController<AuthorizationController>
     /// <param name="userId">User ID</param>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
-    [HttpDelete("account"),Authorize]
+    [HttpDelete,Authorize]
     public async Task<Result<bool>> DeleteAccount(
         CancellationToken cancellationToken = default)
     {
