@@ -18,6 +18,10 @@ var logger = LogManager
 try
 {
     var builder = WebApplication.CreateBuilder(args);
+    builder.WebHost.ConfigureKestrel(options =>
+    {
+        options.ListenAnyIP(5255); 
+    });
     builder.Logging.ClearProviders();
     builder.Host.UseNLog();
 
@@ -78,8 +82,6 @@ try
 
     var app = builder.Build();
     
-    
-    // Swagger barcha muhitlarda ishlashi uchun
     app.UseSwagger();
     app.UseSwaggerUI(options =>
     {
