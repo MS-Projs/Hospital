@@ -6,12 +6,10 @@ namespace Domain.Models.API.Requests;
 
 public record FilterDoctorRequest : PagedRequest
 {
-    [Required]
     [MaxLength(200)]
     [JsonProperty("full_name")]
     public string? FullName { get; set; } 
-    
-    [Required]
+
     [MaxLength(100)]
     [JsonProperty("specialization")]
     public string? Specialization { get; set; }
