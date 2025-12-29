@@ -42,7 +42,10 @@ public class UserService(
             await context.SaveChangesAsync();
         }
         else
+        {
             user = existingUser;
+            user.Status= EntityStatus.Active;
+        }
             
         var newSession = user.Adapt<Session>();
             

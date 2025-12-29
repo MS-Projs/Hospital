@@ -9,15 +9,15 @@ public record FilterDoctorRequest : PagedRequest
     [Required]
     [MaxLength(200)]
     [JsonProperty("full_name")]
-    public string FullName { get; set; } 
+    public string? FullName { get; set; } 
     
     [Required]
     [MaxLength(100)]
     [JsonProperty("specialization")]
-    public string Specialization { get; set; }
+    public string? Specialization { get; set; }
 
     [Range(0, 80)]
     [JsonProperty("experience_years")]
-    public int ExperienceYears { get; set; }
+    public int? ExperienceYears { get; set; }
 
 }

@@ -33,7 +33,12 @@ public class DoctorService : IDoctor
         try
         {
             doctorRequest.FullName = doctorRequest.FullName.Trim();
-            
+
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == doctorRequest.UserId && u.Status != EntityStatus.Deleted,
+                    cancellationToken: cancellationToken);
+            if(user==null)
+                return new ErrorModel(ErrorEnum.UserNotFound);
             DoctorViewModel result;
 
             if (doctorRequest.Id == 0)
@@ -44,6 +49,7 @@ public class DoctorService : IDoctor
                 if (userIsExist != null) return new ErrorModel(ErrorEnum.DoctorAlreadyExist);
 
                 result = await InsertDoctor(doctorRequest,cancellationToken);
+                user.Role = Role.Doctor;
             }
             else  
             {
@@ -54,8 +60,9 @@ public class DoctorService : IDoctor
                 if (doctor == null) return new ErrorModel(ErrorEnum.DoctorNotFound);
 
                 result = await UpdateDoctor(doctorRequest,cancellationToken);
+                user.Role = Role.Doctor;
             }
-           
+            await _context.SaveChangesAsync(cancellationToken);
             return result;
         }
         catch (Exception ex)
@@ -88,6 +95,7 @@ public class DoctorService : IDoctor
         doctor.CreatedDate = DateTime.UtcNow;
         await _context.Doctors.AddAsync(doctor, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+        
         
         return new DoctorViewModel(doctor);
     }
