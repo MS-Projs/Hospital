@@ -14,8 +14,7 @@ public record FilterPatientRequest : PagedRequest
     [Range(0, 120)]
     [JsonProperty("age")]
     public int? Age { get; set; }
-
-    [Required]
+    
     [MaxLength(16)]
     [JsonProperty("gender")]
     public string? Gender { get; set; } 
