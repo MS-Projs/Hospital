@@ -129,7 +129,7 @@ public class PatientService : IPatient
                 patients = patients.Where(x =>
                     x.Gender.Contains(request.Gender));
             
-            if ( request?.Age != 0) 
+            if ( request?.Age != null) 
                 patients = patients.Where(x => x.Age >= request!.Age);
 
                       

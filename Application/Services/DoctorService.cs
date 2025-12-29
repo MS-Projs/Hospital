@@ -138,7 +138,7 @@ public class DoctorService : IDoctor
                 doctors = doctors.Where(x =>
                     x.Specialization.Contains(request.Specialization));
             
-            if ( request?.ExperienceYears != 0) 
+            if ( request?.ExperienceYears != null) 
                 doctors = doctors.Where(x => x.ExperienceYears >= request!.ExperienceYears);
 
             
