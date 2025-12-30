@@ -32,7 +32,12 @@ public class PatientService : IPatient
     {
         try
         {
+            patientRequest.Id??= 0;
             patientRequest.FullName = patientRequest.FullName.Trim();
+           
+            var user = await _context.Users
+                .FirstOrDefaultAsync(u => u.Id == patientRequest.UserId && u.Status != EntityStatus.Deleted, cancellationToken: cancellationToken);
+            if (user == null) return new ErrorModel(ErrorEnum.UserNotFound);
             
             PatientViewModel result;
 
