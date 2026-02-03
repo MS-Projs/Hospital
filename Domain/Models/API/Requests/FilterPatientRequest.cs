@@ -18,5 +18,23 @@ public record FilterPatientRequest : PagedRequest
     [MaxLength(16)]
     [JsonProperty("gender")]
     public string? Gender { get; set; } 
+     
+    /// <summary>
+    /// Filter patients who have appointments with specific doctor
+    /// </summary>
+    [JsonProperty("doctor_id")]
+    public long? DoctorId { get; set; }
+    
+    /// <summary>
+    /// Filter by address (partial match)
+    /// </summary>
+    [JsonProperty("address")]
+    public string? Address { get; set; }
+    
+    /// <summary>
+    /// Filter by user ID
+    /// </summary>
+    [JsonProperty("user_id")]
+    public long? UserId { get; set; }
     
 }
