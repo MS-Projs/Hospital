@@ -21,9 +21,9 @@ public interface IPatient
     Task<Result<DocumentViewModel>> UploadPatientDocument(UploadPatientDocumentRequest request,
         CancellationToken cancellationToken);
 
-    Task<Result<List<DocumentViewModel>>> GetPatientDocuments(long patientId, CancellationToken cancellationToken);
+    Task<Result<List<DocumentViewModel>>> GetPatientDocuments(long patientId,long? requestingDoctorId, CancellationToken cancellationToken);
 
-    Task<Result<(Stream stream, string fileName, string contentType)>> DownloadPatientDocument(long documentId,
+    Task<Result<(Stream stream, string fileName, string contentType)>> DownloadPatientDocument(long documentId,long? requestingDoctorId,
         CancellationToken cancellationToken);
 
     Task<Result<bool>> DeletePatientDocument(long documentId, CancellationToken cancellationToken);

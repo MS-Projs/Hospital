@@ -31,6 +31,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     /// <param name="request">Certificate type information</param>
     /// <returns>Certificate type view model</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<Result<CertificateTypeViewModel>> UpsertCertificateType(
         UpsertCertificateTypeRequest request)
     {
@@ -43,6 +44,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     /// <param name="certificateTypeId">Certificate type ID</param>
     /// <returns>Certificate type view model</returns>
     [HttpGet]
+    [Authorize(Roles = "Admin,Doctor,User")]
     public async Task<Result<CertificateTypeViewModel>> GetCertificateType(
         [FromQuery] long certificateTypeId)
     {
@@ -55,6 +57,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     /// <param name="request">Pagination parameters</param>
     /// <returns>Paginated list of certificate types</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Doctor,User")]
     public async Task<Result<PagedResult<CertificateTypeViewModel>>> GetCertificateTypes(
         PagedRequest request)
     {
@@ -71,6 +74,7 @@ public class CertificateTypeController : MyController<CertificateTypeController>
     /// <param name="certificateTypeId">Certificate type ID</param>
     /// <returns>Updated certificate type view model</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<Result<CertificateTypeViewModel>> ToggleActivation(
         [FromQuery] long certificateTypeId)
     {

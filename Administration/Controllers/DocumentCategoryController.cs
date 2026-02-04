@@ -31,6 +31,7 @@ public class DocumentCategoryController : MyController<DocumentCategoryControlle
     /// <param name="request">Document category information</param>
     /// <returns>Document category view model</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<Result<DocumentCategoryViewModel>> UpsertDocumentCategory(
         UpsertDocumentCategoryRequest request)
     {
@@ -43,6 +44,7 @@ public class DocumentCategoryController : MyController<DocumentCategoryControlle
     /// <param name="documentCategoryId">Document category ID</param>
     /// <returns>Document category view model</returns>
     [HttpGet]
+    [Authorize(Roles = "Admin,Doctor,User")]
     public async Task<Result<DocumentCategoryViewModel>> GetDocumentCategory(
         [FromQuery] long documentCategoryId)
     {
@@ -55,6 +57,8 @@ public class DocumentCategoryController : MyController<DocumentCategoryControlle
     /// <param name="request">Pagination parameters</param>
     /// <returns>Paginated list of document categories</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Doctor,User")]
+    
     public async Task<Result<PagedResult<DocumentCategoryViewModel>>> GetDocumentCategories(
         PagedRequest request)
     {
@@ -71,6 +75,7 @@ public class DocumentCategoryController : MyController<DocumentCategoryControlle
     /// <param name="documentCategoryId">Document category ID</param>
     /// <returns>Updated document category view model</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin")]
     public async Task<Result<DocumentCategoryViewModel>> ToggleActivation(
         [FromQuery] long documentCategoryId)
     {

@@ -3,6 +3,7 @@ using Application.Interfaces;
 using Domain.Models.API.Requests;
 using Domain.Models.API.Results;
 using Domain.Models.Common;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Administration.Controllers;
@@ -10,6 +11,7 @@ namespace Administration.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]/[action]")]
+[Authorize]
 public class AppointmentController : MyController<AppointmentController>
 {
     private readonly IAppointment _appointmentService;
@@ -30,6 +32,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Appointment view model</returns>
     [HttpPost]
+    
     public async Task<Result<AppointmentViewModel>> UpsertAppointment(
         CreateAppointmentRequest request,
         CancellationToken cancellationToken = default)
@@ -90,6 +93,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated Appointment view model</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Doctor")]
     public async Task<Result<AppointmentViewModel>> UpdateAppointmentStatus(
         UpdateAppointmentStatusRequest request,
         CancellationToken cancellationToken = default)
@@ -104,6 +108,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated Appointment view model</returns>
     [HttpPost]
+    
     public async Task<Result<bool>> CancelAppointment(
         [FromQuery] long appointmentId,
         CancellationToken cancellationToken = default)
@@ -122,6 +127,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Created report details</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Doctor")]
     public async Task<Result<ReportViewModel>> CreateReport(
         [FromForm] CreateReportRequest request,
         CancellationToken cancellationToken = default)
@@ -164,6 +170,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Updated report details</returns>
     [HttpPost]
+    [Authorize(Roles = "Admin,Doctor")]
     public async Task<Result<ReportViewModel>> UploadReportFile(
         [FromForm] UploadReportFileRequest request,
         CancellationToken cancellationToken = default)
@@ -178,6 +185,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Report PDF file stream</returns>
     [HttpGet]
+    [Authorize(Roles = "Admin,Doctor")]
     public async Task<IActionResult> DownloadReport(
         [FromQuery] long reportId,
         CancellationToken cancellationToken = default)
@@ -198,6 +206,7 @@ public class AppointmentController : MyController<AppointmentController>
     /// <param name="cancellationToken">Cancellation token</param>
     /// <returns>Success status</returns>
     [HttpDelete]
+    [Authorize(Roles = "Admin,Doctor")]
     public async Task<Result<bool>> DeleteReport(
         [FromQuery] long reportId,
         CancellationToken cancellationToken = default)

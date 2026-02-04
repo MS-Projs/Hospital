@@ -49,7 +49,6 @@ public class DoctorService : IDoctor
 
             // Validate user exists
             var user = await _context.Users
-                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.Id == request.UserId && u.Status != EntityStatus.Deleted,
                     cancellationToken);
 
@@ -63,7 +62,7 @@ public class DoctorService : IDoctor
                 // Check for existing doctor
                 var existingDoctor = await _context.Doctors
                     .AsNoTracking()
-                    .AnyAsync(x => x.UserId == request.UserId && x.Status != EntityStatus.Deleted,
+                    .AnyAsync(x => x.UserId == request.UserId,
                         cancellationToken);
 
                 if (existingDoctor)
@@ -71,8 +70,7 @@ public class DoctorService : IDoctor
 
                 result = await CreateDoctor(request, cancellationToken);
 
-                // Update user role
-                user = await _context.Users.FirstAsync(u => u.Id == request.UserId, cancellationToken);
+                // Update user role but keep inactive until admin approves
                 user.Role = Role.Doctor;
                 await _context.SaveChangesAsync(cancellationToken);
             }
@@ -173,6 +171,116 @@ public class DoctorService : IDoctor
         catch (Exception ex)
         {
             _logger.LogError(ex, "Error toggling doctor {DoctorId} activation", doctorId);
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Admin approves doctor registration and activates the account
+    /// </summary>
+    public async Task<Result<DoctorViewModel>> ApproveDoctor(
+        long doctorId,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var doctor = await _context.Doctors
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.Id == doctorId, cancellationToken);
+
+            if (doctor == null)
+                return new ErrorModel(ErrorEnum.DoctorNotFound);
+
+            // Activate doctor
+            doctor.Status = EntityStatus.Active;
+            doctor.UpdatedDate = DateTime.UtcNow;
+
+            // Activate user account
+            if (doctor.User != null)
+            {
+                doctor.User.Status = EntityStatus.Active;
+                doctor.User.UpdatedDate = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Doctor {DoctorId} approved and activated by admin", doctorId);
+
+            return new DoctorViewModel(doctor);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error approving doctor {DoctorId}", doctorId);
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Admin rejects doctor registration
+    /// </summary>
+    public async Task<Result<bool>> RejectDoctor(
+        long doctorId,
+        string? reason,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var doctor = await _context.Doctors
+                .Include(d => d.User)
+                .FirstOrDefaultAsync(d => d.Id == doctorId, cancellationToken);
+
+            if (doctor == null)
+                return new ErrorModel(ErrorEnum.DoctorNotFound);
+
+            // Soft delete doctor
+            doctor.Status = EntityStatus.Deleted;
+            doctor.UpdatedDate = DateTime.UtcNow;
+
+            // Revert user role to User
+            if (doctor.User != null)
+            {
+                doctor.User.Role = Role.User;
+                doctor.User.UpdatedDate = DateTime.UtcNow;
+            }
+
+            await _context.SaveChangesAsync(cancellationToken);
+
+            _logger.LogInformation("Doctor {DoctorId} rejected by admin. Reason: {Reason}", 
+                doctorId, reason ?? "No reason provided");
+
+            return true;
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error rejecting doctor {DoctorId}", doctorId);
+            return new ErrorModel(ErrorEnum.InternalServerError);
+        }
+    }
+
+    /// <summary>
+    /// Get pending doctor registrations (for admin approval)
+    /// </summary>
+    public async Task<Result<PagedResult<DoctorViewModel>>> GetPendingDoctors(
+        PagedRequest request,
+        CancellationToken cancellationToken)
+    {
+        try
+        {
+            var query = _context.Doctors
+                .Where(d => d.Status == EntityStatus.Inactive);
+
+            var doctors = await query
+                .OrderByDescending(d => d.CreatedDate)
+                .Select(d => new DoctorViewModel(d))
+                .ToListAsync(cancellationToken);
+
+            return request.All
+                ? doctors.ToListResponse()
+                : doctors.ToListResponse(request.PageNumber, request.PageSize);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error getting pending doctors");
             return new ErrorModel(ErrorEnum.InternalServerError);
         }
     }
@@ -330,10 +438,13 @@ public class DoctorService : IDoctor
     {
         var doctor = request.Adapt<Doctor>();
         doctor.CreatedDate = DateTime.UtcNow;
-        doctor.Status = EntityStatus.Active;
+        // Doctor starts as Inactive, waiting for admin approval
+        doctor.Status = EntityStatus.Inactive;
 
         await _context.Doctors.AddAsync(doctor, cancellationToken);
         await _context.SaveChangesAsync(cancellationToken);
+
+        _logger.LogInformation("New doctor registration created {DoctorId}, pending approval", doctor.Id);
 
         return new DoctorViewModel(doctor);
     }

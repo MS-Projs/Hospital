@@ -113,7 +113,7 @@ public class PatientController : MyController<PatientController>
         [FromQuery] long patientId,
         CancellationToken cancellationToken = default)
     {
-        return await _patientService.GetPatientDocuments(patientId, cancellationToken);
+        return await _patientService.GetPatientDocuments(patientId,UserId, cancellationToken);
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class PatientController : MyController<PatientController>
         [FromQuery] long documentId,
         CancellationToken cancellationToken = default)
     {
-        var result = await _patientService.DownloadPatientDocument(documentId, cancellationToken);
+        var result = await _patientService.DownloadPatientDocument(documentId, UserId,cancellationToken);
 
         if (!result.Success)
             return BadRequest(result.Error);

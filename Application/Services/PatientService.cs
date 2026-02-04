@@ -228,6 +228,7 @@ public class PatientService : IPatient
 
     public async Task<Result<List<DocumentViewModel>>> GetPatientDocuments(
         long patientId,
+        long? requestingDoctorId,
         CancellationToken cancellationToken)
     {
         try
@@ -239,6 +240,24 @@ public class PatientService : IPatient
 
             if (!patientExists)
                 return new ErrorModel(ErrorEnum.PatientNotFound);
+
+            // Check doctor authorization if doctorId provided
+            if (requestingDoctorId.HasValue)
+            {
+                var hasAuthorization = await CheckDoctorPatientAccess(
+                    requestingDoctorId.Value,
+                    patientId,
+                    cancellationToken);
+
+                if (!hasAuthorization)
+                {
+                    _logger.LogWarning(
+                        "Doctor {DoctorId} attempted to access documents of unauthorized patient {PatientId}",
+                        requestingDoctorId.Value, patientId);
+                    return new ErrorModel(ErrorEnum.UnauthorizedAccess, 
+                        "You can only view documents of patients you have appointments with");
+                }
+            }
 
             var documents = await _context.PatientDocuments
                 .Include(d => d.DocumentCategory)
@@ -263,6 +282,7 @@ public class PatientService : IPatient
 
     public async Task<Result<(Stream stream, string fileName, string contentType)>> DownloadPatientDocument(
         long documentId,
+        long? requestingDoctorId,
         CancellationToken cancellationToken)
     {
         try
@@ -274,6 +294,24 @@ public class PatientService : IPatient
 
             if (document == null)
                 return new ErrorModel(ErrorEnum.DocumentNotFound);
+
+            // Check doctor authorization if doctorId provided
+            if (requestingDoctorId.HasValue)
+            {
+                var hasAuthorization = await CheckDoctorPatientAccess(
+                    requestingDoctorId.Value,
+                    document.PatientId,
+                    cancellationToken);
+
+                if (!hasAuthorization)
+                {
+                    _logger.LogWarning(
+                        "Doctor {DoctorId} attempted to download document {DocumentId} of unauthorized patient {PatientId}",
+                        requestingDoctorId.Value, documentId, document.PatientId);
+                    return new ErrorModel(ErrorEnum.UnauthorizedAccess,
+                        "You can only download documents of patients you have appointments with");
+                }
+            }
 
             return await _fileService.GetFileAsync(document.FilePath);
         }
@@ -353,22 +391,68 @@ public class PatientService : IPatient
         return new PatientViewModel(patient);
     }
 
+    /// <summary>
+    /// Build patient query with optional doctor filter
+    /// Filters patients by doctor's appointments if DoctorId is provided
+    /// </summary>
     private IQueryable<Patient> BuildPatientQuery(FilterPatientRequest request)
     {
         var query = _context.Patients
             .Where(x => x.Status != EntityStatus.Deleted)
             .AsQueryable();
 
+        // Filter by doctor's appointments
+        if (request.DoctorId.HasValue)
+        {
+            query = query.Where(p => _context.Appointments.Any(a =>
+                a.PatientId == p.Id &&
+                a.DoctorId == request.DoctorId.Value &&
+                a.Status != EntityStatus.Deleted));
+        }
+
+        // Filter by full name
         if (!string.IsNullOrWhiteSpace(request.FullName))
             query = query.Where(x => EF.Functions.ILike(x.FullName, $"%{request.FullName}%"));
 
+        // Filter by gender
         if (!string.IsNullOrWhiteSpace(request.Gender))
             query = query.Where(x => x.Gender == request.Gender);
 
+        // Filter by minimum age
         if (request.Age.HasValue)
             query = query.Where(x => x.Age >= request.Age.Value);
 
         return query;
+    }
+
+    /// <summary>
+    /// Check if doctor has access to patient's data
+    /// Doctor can only access patients they have appointments with
+    /// </summary>
+    private async Task<bool> CheckDoctorPatientAccess(
+        long doctorId,
+        long patientId,
+        CancellationToken cancellationToken)
+    {
+        // Verify doctor exists
+        var doctorExists = await _context.Doctors
+            .AsNoTracking()
+            .AnyAsync(d => d.Id == doctorId && d.Status == EntityStatus.Active,
+                cancellationToken);
+
+        if (!doctorExists)
+            return false;
+
+        // Check if there's any appointment between doctor and patient
+        var hasAppointment = await _context.Appointments
+            .AsNoTracking()
+            .AnyAsync(a =>
+                a.DoctorId == doctorId &&
+                a.PatientId == patientId &&
+                a.Status != EntityStatus.Deleted,
+                cancellationToken);
+
+        return hasAppointment;
     }
 
     #endregion
