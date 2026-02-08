@@ -119,7 +119,7 @@ void MigrateDatabase(WebApplication app)
         // ✅ Faqat Migrate() ishlatilsin
         context.Database.Migrate();
 
-        logger.LogInformation("Database migration completed successfully!");
+        logger.LogCritical("Database migration completed successfully!");
     }
     catch (Exception ex)
     {
