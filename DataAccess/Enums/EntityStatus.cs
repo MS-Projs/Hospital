@@ -5,4 +5,4 @@ public enum EntityStatus : byte
     Active,
     Deleted,
     Inactive
-}
+}                                        

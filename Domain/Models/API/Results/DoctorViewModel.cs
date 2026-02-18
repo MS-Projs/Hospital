@@ -8,33 +8,41 @@ namespace Domain.Models.API.Results;
 
 public class DoctorViewModel
 {
-    [JsonProperty("id")]
     public long Id { get; set; }
-    
-    [Required]
-    [MaxLength(200)]
-    [Column("full_name")]
-    public string FullName { get; set; } 
-    
-    [Required]
-    [MaxLength(100)]
-    [Column("specialization")]
-    public string Specialization { get; set; }
+    public long UserId { get; set; }
+    public string FullName { get; set; } = default!;
+    public string Specialization { get; set; } = default!;
+    public string? Workplace { get; set; }
+    public string? Biography { get; set; }
 
-    [Range(0, 80)]
-    [Column("experience_years")]
-    public int ExperienceYears { get; set; }
-    
-    [Column("status")]
+    // Yangi maydonlar
+    public string? MiddleName { get; set; }
+    public string? WorkPhone { get; set; }
+    public string? BioKeywords { get; set; }
+    public string? AcademicTitle { get; set; }
+    public string? CategoryRank { get; set; }
+    public string? TelegramUrl { get; set; }
+    public bool SocialConsent { get; set; }
+
     public EntityStatus Status { get; set; }
 
-    public DoctorViewModel( Doctor doctor)
+    public DoctorViewModel() { }
+
+    public DoctorViewModel(Doctor doctor)
     {
         Id = doctor.Id;
+        UserId = doctor.UserId;
         FullName = doctor.FullName;
         Specialization = doctor.Specialization;
-        ExperienceYears = doctor.ExperienceYears;
+        Workplace = doctor.Workplace;
+        Biography = doctor.Biography;
+        MiddleName = doctor.MiddleName;
+        WorkPhone = doctor.WorkPhone;
+        BioKeywords = doctor.BioKeywords;
+        AcademicTitle = doctor.AcademicTitle;
+        CategoryRank = doctor.CategoryRank;
+        TelegramUrl = doctor.TelegramUrl;
+        SocialConsent = doctor.SocialConsent;
         Status = doctor.Status;
     }
-    
 }

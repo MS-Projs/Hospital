@@ -19,4 +19,8 @@ public partial class EntityContext
     public virtual DbSet<CertificateType> CertificateTypes { get; set; }
     public virtual DbSet<DocumentCategory> DocumentCategories { get; set; }
 
+    
+    public DbSet<DoctorEducation> DoctorEducations { get; set; }
+    public DbSet<DoctorWorkplace> DoctorWorkplaces { get; set; }
+    public DbSet<DoctorSpecialization> DoctorSpecializations { get; set; }
 }
