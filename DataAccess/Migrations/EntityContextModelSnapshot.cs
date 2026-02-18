@@ -295,7 +295,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("CertificateTypes");
+                    b.ToTable("certificate_types", "public");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Doctor", b =>
@@ -465,7 +465,7 @@ namespace DataAccess.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("DocumentCategories");
+                    b.ToTable("document_category", "public");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.Patient", b =>

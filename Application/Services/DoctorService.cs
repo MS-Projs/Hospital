@@ -35,6 +35,8 @@ public class DoctorService : IDoctor
         _logger = logger;
     }
 
+    #region UpsertDoctor
+
     public async Task<Result<DoctorViewModel>> UpsertDoctor(
         UpsertDoctorRequest request,
         CancellationToken cancellationToken)
@@ -96,6 +98,105 @@ public class DoctorService : IDoctor
         }
     }
 
+    private async Task<DoctorViewModel> CreateDoctor(
+        UpsertDoctorRequest request,
+        CancellationToken cancellationToken)
+    {
+        var doctor = request.Adapt<Doctor>();
+        doctor.CreatedDate = DateTime.UtcNow;
+        doctor.Status = EntityStatus.Inactive;
+
+        await _context.Doctors.AddAsync(doctor, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        await SyncDoctorRelations(doctor.Id, request, cancellationToken);
+
+        _logger.LogInformation("New doctor {DoctorId} created with relations", doctor.Id);
+        return new DoctorViewModel(doctor);
+    }
+
+    private async Task<DoctorViewModel> UpdateDoctor(
+        UpsertDoctorRequest request,
+        CancellationToken cancellationToken)
+    {
+        var doctor = await _context.Doctors
+            .Include(d => d.Workplaces)
+            .Include(d => d.Educations)
+            .Include(d => d.Specializations)
+            .FirstAsync(c => c.Id == request.Id, cancellationToken);
+
+        request.Adapt(doctor);
+        doctor.UpdatedDate = DateTime.UtcNow;
+
+        await SyncDoctorRelations(doctor.Id, request, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
+
+        return new DoctorViewModel(doctor);
+    }
+
+    private async Task SyncDoctorRelations(
+        long doctorId,
+        UpsertDoctorRequest request,
+        CancellationToken cancellationToken)
+    {
+        // Workplaces
+        _context.DoctorWorkplaces.RemoveRange(
+            _context.DoctorWorkplaces.Where(x => x.DoctorId == doctorId));
+
+        if (request.Workplaces != null)
+        {
+            await _context.DoctorWorkplaces.AddRangeAsync(
+                request.Workplaces.Select(w => new DoctorWorkplace
+                {
+                    DoctorId = doctorId,
+                    ClinicName = w.ClinicName,
+                    ClinicAddress = w.ClinicAddress,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = EntityStatus.Active
+                }), cancellationToken);
+        }
+
+        // Educations
+        _context.DoctorEducations.RemoveRange(
+            _context.DoctorEducations.Where(x => x.DoctorId == doctorId));
+
+        if (request.Educations != null)
+        {
+            await _context.DoctorEducations.AddRangeAsync(
+                request.Educations.Select(e => new DoctorEducation
+                {
+                    DoctorId = doctorId,
+                    DegreeType = e.DegreeType,
+                    University = e.University,
+                    Country = e.Country,
+                    GraduationYear = e.GraduationYear,
+                    Specialization = e.Specialization,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = EntityStatus.Active
+                }), cancellationToken);
+        }
+
+        // Specializations
+        _context.DoctorSpecializations.RemoveRange(
+            _context.DoctorSpecializations.Where(x => x.DoctorId == doctorId));
+
+        if (request.Specializations != null)
+        {
+            await _context.DoctorSpecializations.AddRangeAsync(
+                request.Specializations.Select(s => new DoctorSpecialization
+                {
+                    DoctorId = doctorId,
+                    Name = s.Name,
+                    CreatedDate = DateTime.UtcNow,
+                    Status = EntityStatus.Active
+                }), cancellationToken);
+        }
+    }
+
+    #endregion
+
+    #region GetDoctor
+
     public async Task<Result<DoctorSingleViewModel>> GetDoctorById(
         long doctorId,
         CancellationToken cancellationToken)
@@ -103,6 +204,9 @@ public class DoctorService : IDoctor
         try
         {
             var doctor = await _context.Doctors
+                .Include(d => d.Workplaces)
+                .Include(d => d.Educations)
+                .Include(d => d.Specializations)
                 .AsNoTracking()
                 .FirstOrDefaultAsync(d => d.Id == doctorId && d.Status != EntityStatus.Deleted,
                     cancellationToken);
@@ -125,7 +229,6 @@ public class DoctorService : IDoctor
     {
         try
         {
-            // Normalize search criteria
             request.FullName = request.FullName?.Trim();
             request.Specialization = request.Specialization?.Trim().ToLowerInvariant();
 
@@ -145,6 +248,29 @@ public class DoctorService : IDoctor
             _logger.LogError(ex, "Error getting doctors with filter");
             return new ErrorModel(ErrorEnum.InternalServerError);
         }
+    }
+
+    private IQueryable<Doctor> BuildDoctorQuery(FilterDoctorRequest request)
+    {
+        var query = _context.Doctors
+            .Where(x => x.Status != EntityStatus.Deleted)
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(request.FullName))
+            query = query.Where(x => EF.Functions.ILike(x.FullName, $"%{request.FullName}%"));
+
+        if (!string.IsNullOrWhiteSpace(request.Specialization))
+        {
+            query = query.Where(d =>
+                EF.Functions.ILike(d.Specialization, $"%{request.Specialization}%") ||
+                d.Specializations.Any(s =>
+                    EF.Functions.ILike(s.Name, $"%{request.Specialization}%")));
+        }
+
+        if (request.ExperienceYears.HasValue)
+            query = query.Where(x => x.ExperienceYears >= request.ExperienceYears.Value);
+
+        return query;
     }
 
     public async Task<Result<DoctorViewModel>> DoctorToggleActivation(
@@ -175,9 +301,8 @@ public class DoctorService : IDoctor
         }
     }
 
-    /// <summary>
-    /// Admin approves doctor registration and activates the account
-    /// </summary>
+    #endregion
+
     public async Task<Result<DoctorViewModel>> ApproveDoctor(
         long doctorId,
         CancellationToken cancellationToken)
@@ -191,11 +316,9 @@ public class DoctorService : IDoctor
             if (doctor == null)
                 return new ErrorModel(ErrorEnum.DoctorNotFound);
 
-            // Activate doctor
             doctor.Status = EntityStatus.Active;
             doctor.UpdatedDate = DateTime.UtcNow;
 
-            // Activate user account
             if (doctor.User != null)
             {
                 doctor.User.Status = EntityStatus.Active;
@@ -204,7 +327,7 @@ public class DoctorService : IDoctor
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Doctor {DoctorId} approved and activated by admin", doctorId);
+            _logger.LogInformation("Doctor {DoctorId} approved", doctorId);
 
             return new DoctorViewModel(doctor);
         }
@@ -215,9 +338,6 @@ public class DoctorService : IDoctor
         }
     }
 
-    /// <summary>
-    /// Admin rejects doctor registration
-    /// </summary>
     public async Task<Result<bool>> RejectDoctor(
         long doctorId,
         string? reason,
@@ -232,11 +352,9 @@ public class DoctorService : IDoctor
             if (doctor == null)
                 return new ErrorModel(ErrorEnum.DoctorNotFound);
 
-            // Soft delete doctor
             doctor.Status = EntityStatus.Deleted;
             doctor.UpdatedDate = DateTime.UtcNow;
 
-            // Revert user role to User
             if (doctor.User != null)
             {
                 doctor.User.Role = Role.User;
@@ -245,8 +363,8 @@ public class DoctorService : IDoctor
 
             await _context.SaveChangesAsync(cancellationToken);
 
-            _logger.LogInformation("Doctor {DoctorId} rejected by admin. Reason: {Reason}", 
-                doctorId, reason ?? "No reason provided");
+            _logger.LogInformation("Doctor {DoctorId} rejected. Reason: {Reason}",
+                doctorId, reason ?? "No reason");
 
             return true;
         }
@@ -257,9 +375,6 @@ public class DoctorService : IDoctor
         }
     }
 
-    /// <summary>
-    /// Get pending doctor registrations (for admin approval)
-    /// </summary>
     public async Task<Result<PagedResult<DoctorViewModel>>> GetPendingDoctors(
         PagedRequest request,
         CancellationToken cancellationToken)
@@ -430,62 +545,9 @@ public class DoctorService : IDoctor
 
     #endregion
 
-    #region Private Helper Methods
+    #region Certificates
 
-    private async Task<DoctorViewModel> CreateDoctor(
-        UpsertDoctorRequest request,
-        CancellationToken cancellationToken)
-    {
-        var doctor = request.Adapt<Doctor>();
-        doctor.CreatedDate = DateTime.UtcNow;
-        // Doctor starts as Inactive, waiting for admin approval
-        doctor.Status = EntityStatus.Inactive;
-
-        await _context.Doctors.AddAsync(doctor, cancellationToken);
-        await _context.SaveChangesAsync(cancellationToken);
-
-        _logger.LogInformation("New doctor registration created {DoctorId}, pending approval", doctor.Id);
-
-        return new DoctorViewModel(doctor);
-    }
-
-    private async Task<DoctorViewModel> UpdateDoctor(
-        UpsertDoctorRequest request,
-        CancellationToken cancellationToken)
-    {
-        var doctor = await _context.Doctors
-            .FirstAsync(c => c.Id == request.Id, cancellationToken);
-
-        doctor.UserId = request.UserId;
-        doctor.FullName = request.FullName;
-        doctor.Specialization = request.Specialization;
-        doctor.ExperienceYears = request.ExperienceYears;
-        doctor.Workplace = request.Workplace;
-        doctor.Biography = request.Biography;
-        doctor.UpdatedDate = DateTime.UtcNow;
-
-        await _context.SaveChangesAsync(cancellationToken);
-
-        return new DoctorViewModel(doctor);
-    }
-
-    private IQueryable<Doctor> BuildDoctorQuery(FilterDoctorRequest request)
-    {
-        var query = _context.Doctors
-            .Where(x => x.Status != EntityStatus.Deleted)
-            .AsQueryable();
-
-        if (!string.IsNullOrWhiteSpace(request.FullName))
-            query = query.Where(x => EF.Functions.ILike(x.FullName, $"%{request.FullName}%"));
-
-        if (!string.IsNullOrWhiteSpace(request.Specialization))
-            query = query.Where(x => EF.Functions.ILike(x.Specialization, $"%{request.Specialization}%"));
-
-        if (request.ExperienceYears.HasValue)
-            query = query.Where(x => x.ExperienceYears >= request.ExperienceYears.Value);
-
-        return query;
-    }
+    // Upload / Get / Download / Delete methods stay the same (old code compatible)
 
     #endregion
 }

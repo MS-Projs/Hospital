@@ -5,24 +5,25 @@ namespace Domain.Models.API.Requests;
 
 public class UpsertDoctorRequest
 {
-    [JsonProperty("id")] 
-    public long Id { get; set; } = 0;
-    
+    public long Id { get; set; } = 0; // 0 = yangi, >0 = update
     public long UserId { get; set; }
     
-    [Required]
-    [MaxLength(200)]
-    public string FullName { get; set; } = default!; 
-    
-    [Required]
-    [MaxLength(100)]
+    public string FullName { get; set; } = default!;
     public string Specialization { get; set; } = default!;
-
-    [Range(0, 80)]
-    public int ExperienceYears { get; set; }
-
-    [MaxLength(200)]
-    public string? Workplace { get; set; }    
-
+    public string? Workplace { get; set; }
     public string? Biography { get; set; }
+
+    // Yangi maydonlar
+    public string? MiddleName { get; set; }
+    public string? WorkPhone { get; set; }
+    public string? BioKeywords { get; set; }
+    public string? AcademicTitle { get; set; }
+    public string? CategoryRank { get; set; }
+    public string? TelegramUrl { get; set; }
+    public bool SocialConsent { get; set; } = false;
+
+    // Relations
+    public List<DoctorWorkplaceRequest>? Workplaces { get; set; }
+    public List<DoctorEducationRequest>? Educations { get; set; }
+    public List<DoctorSpecializationRequest>? Specializations { get; set; }
 }
