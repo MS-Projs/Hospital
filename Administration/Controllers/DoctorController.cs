@@ -123,4 +123,45 @@ public class DoctorController : MyController<DoctorController>
     {
         return await _doctorService.DeleteDoctorCertificate(certificateId, cancellationToken);
     }
+    
+    #region Verification (Admin only)
+
+    /// <summary>
+    /// Approve doctor profile (set status = Active)
+    /// </summary>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<Result<DoctorViewModel>> ApproveDoctor(
+        [FromQuery] long doctorId,
+        CancellationToken cancellationToken = default)
+    {
+        return await _doctorService.ApproveDoctor(doctorId, cancellationToken);
+    }
+
+    /// <summary>
+    /// Reject doctor profile with reason
+    /// </summary>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<Result<bool>> RejectDoctor(
+        [FromBody] RejectDoctorRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await _doctorService.RejectDoctor(request.DoctorId, request.Reason, cancellationToken);
+    }
+
+    /// <summary>
+    /// Get doctors waiting for verification (Inactive)
+    /// </summary>
+    [HttpPost]
+    [Authorize(Roles = "Admin")]
+    public async Task<Result<PagedResult<DoctorViewModel>>> GetPendingDoctors(
+        [FromBody] PagedRequest request,
+        CancellationToken cancellationToken = default)
+    {
+        return await _doctorService.GetPendingDoctors(request, cancellationToken);
+    }
+
+    #endregion
+    
 }
