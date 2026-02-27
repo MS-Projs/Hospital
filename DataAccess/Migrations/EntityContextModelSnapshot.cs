@@ -307,9 +307,24 @@ namespace DataAccess.Migrations
 
                     NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
 
+                    b.Property<string>("AcademicTitle")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("academic_title");
+
+                    b.Property<string>("BioKeywords")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)")
+                        .HasColumnName("bio_keywords");
+
                     b.Property<string>("Biography")
                         .HasColumnType("text")
                         .HasColumnName("biography");
+
+                    b.Property<string>("CategoryRank")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("category_rank");
 
                     b.Property<DateTime>("CreatedDate")
                         .HasColumnType("timestamp with time zone")
@@ -325,6 +340,15 @@ namespace DataAccess.Migrations
                         .HasColumnType("character varying(200)")
                         .HasColumnName("full_name");
 
+                    b.Property<string>("MiddleName")
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("middle_name");
+
+                    b.Property<bool>("SocialConsent")
+                        .HasColumnType("boolean")
+                        .HasColumnName("social_consent");
+
                     b.Property<string>("Specialization")
                         .IsRequired()
                         .HasMaxLength(100)
@@ -335,6 +359,11 @@ namespace DataAccess.Migrations
                         .HasColumnType("smallint")
                         .HasColumnName("status");
 
+                    b.Property<string>("TelegramUrl")
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("telegram_url");
+
                     b.Property<DateTime?>("UpdatedDate")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_date");
@@ -342,6 +371,11 @@ namespace DataAccess.Migrations
                     b.Property<long>("UserId")
                         .HasColumnType("bigint")
                         .HasColumnName("user_id");
+
+                    b.Property<string>("WorkPhone")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("work_phone");
 
                     b.Property<string>("Workplace")
                         .HasMaxLength(200)
@@ -415,6 +449,129 @@ namespace DataAccess.Migrations
                     b.HasIndex("DoctorId");
 
                     b.ToTable("doctor_certificates", "public");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorEducation", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Country")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<string>("DegreeType")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<long>("DoctorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<int>("GraduationYear")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Specialization")
+                        .HasColumnType("text");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<string>("University")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorEducations");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorSpecialization", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<long>("DoctorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorSpecializations");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorWorkplace", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint")
+                        .HasColumnName("id");
+
+                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("ClinicAddress")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ClinicName")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<DateTime>("CreatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_date");
+
+                    b.Property<long>("DoctorId")
+                        .HasColumnType("bigint");
+
+                    b.Property<byte>("Status")
+                        .HasColumnType("smallint")
+                        .HasColumnName("status");
+
+                    b.Property<DateTime?>("UpdatedDate")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("updated_date");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("DoctorId");
+
+                    b.ToTable("DoctorWorkplaces");
                 });
 
             modelBuilder.Entity("DataAccess.Schemas.Public.DocumentCategory", b =>
@@ -719,6 +876,39 @@ namespace DataAccess.Migrations
                     b.Navigation("Doctor");
                 });
 
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorEducation", b =>
+                {
+                    b.HasOne("DataAccess.Schemas.Public.Doctor", "Doctor")
+                        .WithMany("Educations")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorSpecialization", b =>
+                {
+                    b.HasOne("DataAccess.Schemas.Public.Doctor", "Doctor")
+                        .WithMany("Specializations")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.DoctorWorkplace", b =>
+                {
+                    b.HasOne("DataAccess.Schemas.Public.Doctor", "Doctor")
+                        .WithMany("Workplaces")
+                        .HasForeignKey("DoctorId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Doctor");
+                });
+
             modelBuilder.Entity("DataAccess.Schemas.Public.Patient", b =>
                 {
                     b.HasOne("DataAccess.Schemas.Auth.User", "User")
@@ -777,6 +967,15 @@ namespace DataAccess.Migrations
                     b.Navigation("Doctor");
 
                     b.Navigation("Patient");
+                });
+
+            modelBuilder.Entity("DataAccess.Schemas.Public.Doctor", b =>
+                {
+                    b.Navigation("Educations");
+
+                    b.Navigation("Specializations");
+
+                    b.Navigation("Workplaces");
                 });
 #pragma warning restore 612, 618
         }
