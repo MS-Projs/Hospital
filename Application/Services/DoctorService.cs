@@ -73,7 +73,8 @@ public class DoctorService : IDoctor
                 result = await CreateDoctor(request, cancellationToken);
 
                 // Update user role but keep inactive until admin approves
-                user.Role = Role.Doctor;
+                //user.Role = Role.Doctor;
+                //user.UpdatedDate = DateTime.UtcNow;
                 await _context.SaveChangesAsync(cancellationToken);
             }
             else
@@ -322,6 +323,7 @@ public class DoctorService : IDoctor
             if (doctor.User != null)
             {
                 doctor.User.Status = EntityStatus.Active;
+                doctor.User.Role = Role.Doctor;
                 doctor.User.UpdatedDate = DateTime.UtcNow;
             }
 

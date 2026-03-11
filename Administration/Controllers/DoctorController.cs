@@ -74,7 +74,7 @@ public class DoctorController : MyController<DoctorController>
     /// Upload a certificate for a doctor
     /// </summary>
     [HttpPost("upload-certificate")]
-    [Authorize(Roles = "Admin,Doctor")]
+    [Authorize(Roles = "Admin,Doctor,User")]
     public async Task<Result<CertificateViewModel>> UploadCertificate(
         [FromForm] UploadDoctorCertificateRequest request,
         CancellationToken cancellationToken = default)
