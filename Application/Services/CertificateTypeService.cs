@@ -32,11 +32,11 @@ public class CertificateTypeService : ICertificateType
             request.ValueUz = request.ValueUz.Trim();
             request.ValueUzl = request.ValueUzl.Trim();
 
-            if (!string.IsNullOrEmpty(request.KeyWord)
-                || !string.IsNullOrEmpty(request.ValueEn)
-                || !string.IsNullOrEmpty(request.ValueRu)
-                || !string.IsNullOrEmpty(request.ValueUz)
-                || !string.IsNullOrEmpty(request.ValueUzl))
+            if (string.IsNullOrEmpty(request.KeyWord)
+                || string.IsNullOrEmpty(request.ValueEn)
+                || string.IsNullOrEmpty(request.ValueRu)
+                || string.IsNullOrEmpty(request.ValueUz)
+                || string.IsNullOrEmpty(request.ValueUzl))
                 return new ErrorModel(ErrorEnum.BadRequest);
 
             CertificateType? certificateType;
